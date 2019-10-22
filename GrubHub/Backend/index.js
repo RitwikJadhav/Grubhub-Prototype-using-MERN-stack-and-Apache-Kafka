@@ -66,6 +66,8 @@ const profileOwnerRoutes = require('./api/routes/profileOwner/profileOwner');
 const menuRoutesHomePage = require('./api/routes/menu/homepage');
 const searchRoutes = require('./api/routes/search/searchResults');
 const restaurantRoutes = require('./api/routes/restaurants/restaurantDetails');
+const orderRoutes = require('./api/routes/orders/order');
+const messageRoutes = require('./api/routes/message/messages');
 
 app.use('/Login',loginRoutes);
 app.use('/Signup',signUpRoutes);
@@ -74,6 +76,8 @@ app.use('/ProfileOwner',profileOwnerRoutes);
 app.use('/Menu',menuRoutesHomePage);
 app.use('/SearchResults',searchRoutes);
 app.use('/Restaurant',restaurantRoutes);
+app.use('/Order',orderRoutes);
+app.use('/Message',messageRoutes);
 
 const storage = multer.diskStorage({
     destination : path.join(__dirname,".") + "/public/uploads",
@@ -157,161 +161,6 @@ app.get("/uploadsItem/:imageId", function(req,res) {
         res.sendFile(image + '.png');
     }
 })*/
-
-
-app.post("/RecentOrderReq", function(req,res) {
-    console.log("Inside recent order get request");
-    let restaurantToSearch = req.body.restaurantName;
-    let sql = "SELECT orderid,ItemNames,OrderPersonName,Status from orders WHERE RestaurantName = "+mysql.escape(restaurantToSearch);
-    console.log("Query : "+sql);
-
-    pool.getConnection(function(err,con) {
-        if(err) {
-            console.log(err);
-            res.writeHead(400, {
-                "Content-Type" : "text/plain"
-            });
-            res.end("Connection not established");
-        }
-        else {
-            con.query(sql,function(err,result) {
-                if(err) {
-                    console.log('Error : '+err);
-                    res.writeHead(400, {
-                        "Content-Type" : "text/plain"
-                    });
-                    res.end("Wrong credentials");
-                }
-                else {
-                    res.cookie("cookie","admin", {
-                        maxAge: 900000, httpOnly: false, path : '/'
-                    });
-                    console.log(JSON.stringify(result));
-                    res.send(JSON.stringify(result));
-                    //res.end("Successful section addition");
-                }
-            })
-        }
-    });
-});
-
-
-app.post("/OrderStatusUpdate", function(req,res) {
-    console.log("Inside recent order get request");
-    let itemName = req.body.itemName;
-    let orderid = req.body.orderid;
-    let selectedValue = req.body.selectedValue;
-    let sql = "Update orders SET Status = "+mysql.escape(selectedValue)+" WHERE orderid = "+mysql.escape(orderid);
-    console.log("Query : "+sql);
-
-    pool.getConnection(function(err,con) {
-        if(err) {
-            console.log(err);
-            res.writeHead(400, {
-                "Content-Type" : "text/plain"
-            });
-            res.end("Connection not established");
-        }
-        else {
-            con.query(sql,function(err,result) {
-                if(err) {
-                    console.log('Error : '+err);
-                    res.writeHead(400, {
-                        "Content-Type" : "text/plain"
-                    });
-                    res.end("Wrong credentials");
-                }
-                else {
-                    res.cookie("cookie","admin", {
-                        maxAge: 900000, httpOnly: false, path : '/'
-                    });
-                    console.log(JSON.stringify(result));
-                    res.send(JSON.stringify(result));
-                    //res.end("Successful section addition");
-                }
-            })
-        }
-    });
-});
-
-app.post("/GetRecentOrderRequest", function(req,res) {
-    console.log("Inside recent order get customer request");
-    let orderid = req.body.orderid;
-    let totalCost = req.body.orderTotalCost;
-    let restaurantName = req.body.restaurantName;
-    let firstName = req.body.firstName;
-    let lastName = req.body.lastName;
-    let fullName = firstName + " " + lastName;
-    let sql = "SELECT ItemNames,Status,Total,RestaurantName from orders WHERE OrderPersonName = "+mysql.escape(fullName)+" AND Status <> 'Order delivered'";
-    console.log("Query : "+sql);
-
-    pool.getConnection(function(err,con) {
-        if(err) {
-            console.log(err);
-            res.writeHead(400, {
-                "Content-Type" : "text/plain"
-            });
-            res.end("Connection not established");
-        }
-        else {
-            con.query(sql,function(err,result) {
-                if(err) {
-                    console.log('Error : '+err);
-                    res.writeHead(400, {
-                        "Content-Type" : "text/plain"
-                    });
-                    res.end("Wrong credentials");
-                }
-                else {
-                    res.cookie("cookie","admin", {
-                        maxAge: 900000, httpOnly: false, path : '/'
-                    });
-                    console.log(JSON.stringify(result));
-                    res.send(JSON.stringify(result));
-                    //res.end("Successful section addition");
-                }
-            })
-        }
-    });
-});
-
-app.post("/GetDeliveredItems", function(req,res) {
-    console.log("Inside recent order get customer request");
-    let firstName = req.body.firstName;
-    let lastName = req.body.lastName;
-    let orderPersonName = firstName +" "+ lastName;
-    let sql = "SELECT ItemNames,Status,Total,RestaurantName from orders WHERE OrderPersonName = "+mysql.escape(orderPersonName)+" AND Status = 'Order Delivered'";
-    console.log("Query : "+sql);
-
-    pool.getConnection(function(err,con) {
-        if(err) {
-            console.log(err);
-            res.writeHead(400, {
-                "Content-Type" : "text/plain"
-            });
-            res.end("Connection not established");
-        }
-        else {
-            con.query(sql,function(err,result) {
-                if(err) {
-                    console.log('Error : '+err);
-                    res.writeHead(400, {
-                        "Content-Type" : "text/plain"
-                    });
-                    res.end("Wrong data");
-                }
-                else if(result.length == 0) {
-                    console.log('No data received');
-                }
-                else {
-                    console.log(JSON.stringify(result));
-                    res.send(JSON.stringify(result));
-                    //res.end("Successful section addition");
-                }
-            })
-        }
-    });
-});
 
 app.listen(3001);
 console.log("Server listening on port 3001");

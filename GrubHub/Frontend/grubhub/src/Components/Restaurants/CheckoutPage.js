@@ -227,7 +227,11 @@ class CheckoutPage extends Component {
             totalCost : sessionStorage.getItem('TotalwithTaxes')
         }
         sessionStorage.setItem('orderidforcustomer',data.orderId);
-        axios.post('http://localhost:3001/Restaurant/CheckoutOrders',data)
+        axios.post('http://localhost:3001/Restaurant/CheckoutOrders',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
         .then(response => {
             console.log(response.status);
             this.props.history.push('/home');

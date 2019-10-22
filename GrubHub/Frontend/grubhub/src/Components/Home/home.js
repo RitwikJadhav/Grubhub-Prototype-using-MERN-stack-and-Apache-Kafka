@@ -7,7 +7,7 @@ import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import pizzaImage from './cropped-2.jpg';
 import searchIcon from './search.svg';
-import { Modal,Button } from 'react-bootstrap';
+import { Modal,Button,InputGroup,FormControl, Alert } from 'react-bootstrap';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -58,7 +58,7 @@ const inputStyle1 = {
 const divStyle2 = {
     backgroundColor : '#FEFEFE',
     width : '250px',
-    height : '250px',
+    height : '275px',
     marginLeft : '0px',
     marginTop : '20px'
 }
@@ -114,6 +114,39 @@ const pStyle4 = {
     marginTop : '-580px'
 }
 
+const buttonStyle3 = {
+    marginLeft : '30px',
+    marginTop : '10px'
+
+}
+
+const modalStyle = {
+    fontFamily : 'graphik'
+}
+
+const pStyle6 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '19px',
+    fontWeight : '900'
+}
+
+const pStyle7 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '19px',
+    fontWeight : '900'
+}
+
+const inputStyle9 = {
+    marginTop : '-14px',
+    marginBottom : '5px'
+}
+
+const inputStyle8 = {
+    marginTop : '-14px',
+    marginBottom : '5px'
+}
+
+
 class home extends Component {
     constructor(props) {
         super(props);
@@ -127,12 +160,19 @@ class home extends Component {
             firstName : "",
             lastName : "",
             delivered : [],
-            setShow : false
+            setShow : false,
+            setShowModal : false,
+            receiver : "",
+            message : "",
+            alertShow : false,
+            messages : []
         }
 
         this.handleLogout = this.handleLogout.bind(this);
         this.handleSearchResults = this.handleSearchResults.bind(this);
         this.handleClose = this.handleClose.bind(this);
+        this.handlesetModalShow = this.handlesetModalShow.bind(this);
+        this.handleMessage = this.handleMessage.bind(this);
     }
 
     componentDidMount() {
@@ -141,10 +181,15 @@ class home extends Component {
             orderTotalCost : sessionStorage.getItem('TotalwithTaxes'),
             restaurantName : localStorage.getItem('RestaurantNameForCustomer'),
             firstName : localStorage.getItem('FirstName'),
-            lastName : localStorage.getItem('LastName')
+            lastName : localStorage.getItem('LastName'),
+            fullName : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName')
         }
         console.log(data);
-        axios.post('http://localhost:3001/GetRecentOrderRequest',data)
+        axios.post('http://localhost:3001/Order/GetRecentOrderRequest',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
         .then(response => {
             console.log(response.data);
             this.setState({
@@ -162,7 +207,11 @@ class home extends Component {
         }
 
         console.log(data1);
-        axios.post('http://localhost:3001/GetDeliveredItems',data1)
+        axios.post('http://localhost:3001/Order/GetDeliveredItems',data1,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
         .then(response => {
             console.log(response.data)
             this.setState({
@@ -186,7 +235,14 @@ class home extends Component {
 
     handleClose = () => {
         this.setState({
-            setShow : false
+            setShow : false,
+            alertShow : false
+        })
+    }
+
+    handleCloseModal = () => {
+        this.setState({
+            setShowModal : false
         })
     }
 
@@ -226,17 +282,64 @@ class home extends Component {
         })
     }
 
-    render() {  
-        let redirectVar = null;
-        if(!cookie.load('cookie')) {
-            redirectVar = <Redirect to = '/' />
+    handlesetModalShow = (restName) => {
+        this.setState({
+            setShowModal : true
+        })
+
+        console.log('Inside handle received messages');
+        const data = {
+            restaurantName : restName
         }
+        axios.post('http://localhost:3001/Message/ReceivedReply',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+            this.setState({
+                messages : response.data
+            });
+        }) 
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
+    handleMessage = () => {
+        console.log('Inside message send post request');
+        const data = {
+            sender : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName'),
+            receiver : this.state.receiver,
+            date : new Date(),
+            message : this.state.message
+        }
+        axios.post('http://localhost:3001/Message/SendMessage',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response);
+            this.setState({
+                alertShow : true
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        })
+
+    }
+
+    render() {  
         const orderNameList = this.state.items.map((item) => (
             <div key = {item.orderid} style = {divStyle2}>
                 <div style = {divStyle4}>{item.Status}</div>
                 <div style = {divStyle3}>{item.ItemNames}</div>
                 <div style = {divStyle3}>{item.RestaurantName}</div>
                 <div style = {divStyle3}>{item.Total}</div>
+                <button className = "btn btn-primary" style = {buttonStyle3} onClick = {this.handlesetModalShow.bind(this,item.RestaurantName)}>Message</button>
             </div>
         ));
         const deliveredList = this.state.delivered.map((delItem) => (
@@ -247,9 +350,21 @@ class home extends Component {
                 <div style = {divStyle3}>{delItem.Total}</div>
             </div>
         ));
+        var messagesReceived;
+        if(this.state.messages != null) {
+            messagesReceived = this.state.messages.map((msg) => (
+                <div>
+                    <p style = {pStyle6}>From : </p>
+                    <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>
+                    <p style = {pStyle7}>Message : </p>
+                    <textarea className = "form-control" defaultValue = {msg.message} style = {inputStyle8}></textarea>
+                    <hr/>
+                </div>
+            ));
+        }
+
         return (
             <div>
-                {redirectVar}
                 <div style = {bodyStyle}>
                     <nav className = "navbar navbar-expand-lg navbar-light bg-light" style = {navStyle} >
                         <a className="navbar-brand" href="#">
@@ -300,6 +415,42 @@ class home extends Component {
                     <Modal.Body>No item found.</Modal.Body>
                     <Modal.Footer>
                         <Button variant="primary" onClick={this.handleClose}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.setShowModal} onHide={this.handleCloseModal} style = {modalStyle}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Message the Restaurant Owner</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    {messagesReceived}
+                    <Alert show = {this.state.alertShow} variant = 'success'>
+                        Message sent.
+                    </Alert>
+                    <InputGroup>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>To</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            name = "receiver"
+                            onChange = {this.handleInput}
+                            placeholder="Restaurant's Name"
+                            required/>
+                    </InputGroup>
+                    <InputGroup>
+                        <FormControl 
+                            as="textarea"
+                            name = "message"
+                            onChange = {this.handleInput}
+                            required/>
+                     </InputGroup>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={this.handleMessage}>
+                            Send
+                        </Button>
+                        <Button variant="primary" onClick={this.handleCloseModal}>
                             Close
                         </Button>
                     </Modal.Footer>

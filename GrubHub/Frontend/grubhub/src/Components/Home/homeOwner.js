@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import OwnerOrderContainer from './OwnerOrderContainer';
+import { Modal,Button,InputGroup,FormControl, Alert } from 'react-bootstrap';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -116,6 +117,41 @@ const pStyle3 = {
     fontWeight : '900'
 }
 
+const pStyle5 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '22px',
+    marginLeft : '65px',
+    paddingTop : '10px',
+    textDecoration : 'none',
+    fontWeight : '900'
+}
+
+const modalStyle = {
+    fontFamily : 'graphik'
+}
+
+const pStyle6 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '19px',
+    fontWeight : '900'
+}
+
+const pStyle7 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '19px',
+    fontWeight : '900'
+}
+
+const inputStyle = {
+    marginTop : '-14px',
+    marginBottom : '5px'
+}
+
+const inputStyle1 = {
+    marginTop : '-14px',
+    marginBottom : '5px'
+}
+
 class homeOwner extends Component {
     constructor(props) {
         super(props);
@@ -125,10 +161,20 @@ class homeOwner extends Component {
             selectedValue : "",
             orderid : "",
             itemName : "",
-            delivered : []
+            delivered : [],
+            setShow : false,
+            messages : [],
+            message : "",
+            sender : "",
+            alertShow : false,
+            receiver : ""
         }
 
         this.handleLogout = this.handleLogout.bind(this);
+        this.handleMessagesModal = this.handleMessagesModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.handleReceivedMessages = this.handleReceivedMessages.bind(this);
+        this.handleInput = this.handleInput.bind(this);
     }
 
     componentDidMount() {
@@ -136,21 +182,23 @@ class homeOwner extends Component {
         const data = {
             restaurantName : localStorage.getItem('RestaurantName')
         }
-        axios.post('http://localhost:3001/RecentOrderReq',data)
+        axios.post('http://localhost:3001/Order/RecentOrderReq',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
         .then(response => {
             console.log(response.data);
             let i;
-            for(i = 0; i < response.data.length;i++) {
-                if(response.data[i].Status == 'Order delivered') {
-                    this.setState({
-                        delivered : [response.data[i]]
-                    })
-                }
-                else {
-                    this.setState({
-                        orders : response.data
-                    })        
-                }
+            if(response.data.Status == 'Order delivered') {
+                this.setState({
+                        delivered : response.data
+                })
+            }
+            else {
+                this.setState({
+                    orders : response.data
+                })        
             }
         })
         .catch(err => {
@@ -164,11 +212,74 @@ class homeOwner extends Component {
         cookie.remove('cookie',{ path : '/' });
     }
 
+    handleMessagesModal = () => {
+        this.setState({
+            setShow : true
+        });
+
+        console.log('Inside handle received messages');
+        const data = {
+            restaurantName : localStorage.getItem('RestaurantName')
+        }
+        axios.post('http://localhost:3001/Message/ReceivedMessages',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+            this.setState({
+                messages : response.data
+            });
+        }) 
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
+    handleCloseModal = () => {
+        this.setState({
+            setShow : false,
+            alertShow : false
+        });
+    }
+
+    handleReceivedMessages = () => {
+        
+    }
+
+    handleMessage = () => {
+        console.log('Inside message reply send request');
+        const data = {
+            sender : localStorage.getItem('RestaurantName'),
+            receiver : this.state.receiver,
+            message : this.state.message
+        }
+        axios.post('http://localhost:3001/Message/SendReply',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response);
+            this.setState({
+                alertShow : true
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+
+    handleInput = (e) => {
+        this.setState({
+            [e.target.name] : e.target.value
+        })
+    }
+
+
     render() {  
         let redirectVar = null;
-        if(!cookie.load('cookie')) {
-            redirectVar = <Redirect to = '/' />
-        }
         const delivered = this.state.delivered.map((delItem) => (
             <div key = {delItem.orderid}>
                 <p style = {pStyle4}>Order id</p>
@@ -180,9 +291,18 @@ class homeOwner extends Component {
                 <div></div>
             </div>
         )); 
+
+        const messagesReceived = this.state.messages.map((msg) => (
+            <div>
+                <p style = {pStyle6}>From : </p>
+                <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle}></input>
+                <p style = {pStyle7}>Message : </p>
+                <textarea className = "form-control" defaultValue = {msg.message} style = {inputStyle1}></textarea>
+                <hr/>
+            </div>
+        ));
         return (
             <div>
-                {redirectVar}
                 <div style = {bodyStyle}>
                     <nav className = "navbar navbar-expand-lg navbar-light bg-light" style = {navStyle} >
                         <a className="navbar-brand" href="#">
@@ -202,6 +322,9 @@ class homeOwner extends Component {
                     <div className = "containerLeft" style = {containerClassLeft}>
                         <p style = {pStyle}><Link to = {"/Menu/HomePage/"+localStorage.getItem('RestaurantName')}>Edit your Menu</Link></p>
                         <hr/>
+                        <br/><br/><br/>
+                        <hr/>
+                        <p style = {pStyle5}><Link onClick = {this.handleMessagesModal}>Check your messages</Link></p>
                     </div>
                     <div className = "container" style = {containerClass}>
                         <p style = {pStyle}>Recent Orders</p>
@@ -213,6 +336,42 @@ class homeOwner extends Component {
                         {delivered}
                     </div>  
                 </div>
+                <Modal show={this.state.setShow} onHide={this.handleCloseModal} style = {modalStyle}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Messages</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {messagesReceived}
+                    <Alert show = {this.state.alertShow} variant = 'success'>
+                        Message sent.
+                    </Alert>
+                    <InputGroup>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>To</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            name = "receiver"
+                            onChange = {this.handleInput}
+                            placeholder="Customer's Name"
+                        required/>
+                    </InputGroup>
+                    <InputGroup>
+                        <FormControl 
+                            as="textarea"
+                            name = "message"
+                            onChange = {this.handleInput}
+                            required/>
+                     </InputGroup>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={this.handleMessage}>
+                            Send
+                        </Button>
+                        <Button variant="primary" onClick={this.handleCloseModal}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         )
     }

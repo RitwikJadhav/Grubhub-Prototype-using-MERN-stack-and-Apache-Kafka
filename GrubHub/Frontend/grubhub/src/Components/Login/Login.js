@@ -7,7 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from './grubhub-vector-logo.svg';
 import axios from 'axios';
 import { Modal,Button } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { loginRequest } from '../../actions/loginAction';
 var jwtDecode = require('jwt-decode');
+
+
  
 const loginContainerStyle = {
     backgroundColor : '#FEFEFE',
@@ -119,6 +124,7 @@ class Login extends Component {
             setShow : false
         }
         console.log(data);
+        //this.props.loginRequest(data);
         axios.defaults.withCredentials = true;
         axios.post('http://localhost:3001/Login',data)
         .then(response => {
@@ -134,22 +140,6 @@ class Login extends Component {
                 if(decodedResponse.role == 'Buyer' || decodedResponse.role == 'Owner') {
                 //if(response.data[0].role == 'Buyer' || response.data[0].role == 'Owner') {
                     console.log(response.data);
-                    /*localStorage.setItem('Email',response.data[0].Email);
-                    localStorage.setItem('FirstName',response.data[0].FirstName);
-                    localStorage.setItem('LastName',response.data[0].LastName);
-                    localStorage.setItem('PhoneNumber',response.data[0].PhoneNumber);
-                    localStorage.setItem('RestaurantName',response.data[0].RestaurantName);
-                    localStorage.setItem('RestaurantZipCode',response.data[0].RestaurantZipCode);
-                    localStorage.setItem('Cuisine',response.data[0].Cuisine);
-                    this.setState({
-                        authFlag : true
-                    })
-                    if(response.data[0].role === 'Buyer') {
-                        this.props.history.push('/home');        
-                    }
-                    else if(response.data[0].role === 'Owner') {
-                        this.props.history.push('/homeOwner');
-                    }*/
                     console.log('yeee');
                     this.setState({
                         email : decodedResponse.Email,
@@ -247,5 +237,9 @@ class Login extends Component {
         )
     }
 }
+
+/*Login.propTypes = {
+    loginRequest : PropTypes.func.isRequired
+};*/
 
 export default Login;

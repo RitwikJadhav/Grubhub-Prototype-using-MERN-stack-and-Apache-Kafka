@@ -170,13 +170,8 @@ class MenuHomePage extends Component {
     }
 
     render() {  
-        let redirectVar = null;
-        if(!cookie.load('cookie')) {
-            redirectVar = <Redirect to = '/' />
-        }
         return (
             <div>
-                {redirectVar}
                 <div style = {bodyStyle}>
                     <nav className = "navbar navbar-expand-lg navbar-light bg-light" style = {navStyle} >
                         <a class="navbar-brand" href="#">

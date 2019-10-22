@@ -106,10 +106,15 @@ class OwnerOrderItem extends Component {
         console.log('Inside order update request');
         const data = {
             selectedValue : this.state.selectedValue,
-            orderid : this.props.order.orderid        
+            orderid : this.props.order.orderid,
+            orderPersonName : this.props.order.OrderPersonName        
         }
         console.log(data);
-        axios.post('http://localhost:3001/OrderStatusUpdate',data)
+        axios.post('http://localhost:3001/Order/OrderStatusUpdate',data,{
+            headers : {
+                Authorization : 'JWT ' + localStorage.getItem('Token')
+            }
+        })
         .then(response => {
             console.log(response.data);
             this.setState({
