@@ -7,7 +7,11 @@ const messages = new mongoose.Schema({
     }],
     sender : String,
     receiver : String,
-    datetime : Date
+    datetime : Date,
+    reply : [{
+        type : String
+    }],
+    orderid : String
 });
 
 module.exports = mongoose.model('Messages',messages);

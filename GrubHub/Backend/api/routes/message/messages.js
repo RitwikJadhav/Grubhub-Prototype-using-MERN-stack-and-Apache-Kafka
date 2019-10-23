@@ -7,38 +7,77 @@ const Messages = require('../../models/messageModel');
 
 router.post('/SendMessage', passport.authenticate('jwt',{ session : false }), function(req,res) {
     console.log('Inside message send request');
-    const messages = new Messages({
-        _id : new mongoose.Types.ObjectId(),
+    console.log('Sender : '+req.body.sender);
+    console.log('Sender : '+req.body.receiver);
+    Messages.findOne({
         sender : req.body.sender,
-        receiver : req.body.receiver,
-        message : req.body.message,
-        date : req.body.date
-    })
-
-    messages.save()
-    .then(response => {
-        console.log(response);
-        if(!response) {
-            res.json({
-                success : false,
-                message : 'Message not saved'
+        receiver : req.body.receiver
+    }, function(err,result) {
+        console.log('Err : '+err );
+        console.log('Result : ' +result);
+        if(!result) {
+            const messages = new Messages({
+                _id : new mongoose.Types.ObjectId(),
+                sender : req.body.sender,
+                receiver : req.body.receiver,
+                message : req.body.message,
+                date : req.body.date
+            })
+        
+            messages.save()
+            .then(response => {
+                console.log(response);
+                if(!response) {
+                    res.json({
+                        success : false,
+                        message : 'Message not saved'
+                    });
+                }
+                else {
+                    console.log(response);
+                    res.json({
+                        success : true,
+                        message : 'Message saved successfully'
+                    })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.json({
+                    success : false,
+                    message : 'Error in adding sections'
+                });
             });
         }
-        else {
-            console.log(response);
-            res.json({
-                success : true,
-                message : 'Message saved successfully'
+        else if(result) {
+            Messages.update({
+                $push : { message : req.body.message}
             })
+            .then(response => {
+                console.log(response);
+                if(!response) {
+                    res.json({
+                        success : false,
+                        message : 'Message not saved'
+                    });
+                }
+                else {
+                    console.log(response);
+                    res.json({
+                        success : true,
+                        message : 'Message updated successfully'
+                    })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.json({
+                    success : false,
+                    message : 'Error in adding sections'
+                });
+            });
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Error in adding sections'
-        });
-    });
+    }); 
 });
 
 router.post('/ReceivedMessages', passport.authenticate('jwt',{ session : false }), function(req,res) {
@@ -70,14 +109,11 @@ router.post('/ReceivedMessages', passport.authenticate('jwt',{ session : false }
 
 router.post('/SendReply', passport.authenticate('jwt',{ session : false }), function(req,res) {
     console.log('Inside message send request');
-    const messages = new Messages({
-        _id : new mongoose.Types.ObjectId(),
-        sender : req.body.sender,
-        receiver : req.body.receiver,
-        message : req.body.message
-    })
 
-    messages.save()
+    Messages.findOneAndUpdate(
+        { receiver : req.body.sender,
+        sender : req.body.receiver},
+        {$push : {reply : req.body.message}})
     .then(response => {
         console.log(response);
         if(!response) {
@@ -107,7 +143,7 @@ router.post('/ReceivedReply', passport.authenticate('jwt',{ session : false }), 
     console.log('Inside message reply request');
 
     Messages.find({
-        sender : req.body.restaurantName
+        receiver : req.body.restaurantName
     })
     .then(response => {
         console.log(response);

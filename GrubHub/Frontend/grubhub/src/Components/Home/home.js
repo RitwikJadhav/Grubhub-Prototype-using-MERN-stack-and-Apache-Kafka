@@ -138,12 +138,28 @@ const pStyle7 = {
 
 const inputStyle9 = {
     marginTop : '-14px',
-    marginBottom : '5px'
+    marginBottom : '5px',
+    width : '230px'
 }
 
 const inputStyle8 = {
     marginTop : '-14px',
-    marginBottom : '5px'
+    marginBottom : '5px',
+    width : '230px'
+}
+
+const pStyle8 = {
+    fontFamily : 'graphik-sans',
+    fontSize : '19px',
+    fontWeight : '900',
+    marginLeft : '330px'
+}
+
+const inputStyle10 = {
+    marginTop : '-14px',
+    marginBottom : '5px',
+    width : '230px',
+    marginLeft : '230px'
 }
 
 
@@ -165,7 +181,8 @@ class home extends Component {
             receiver : "",
             message : "",
             alertShow : false,
-            messages : []
+            messages : [],
+            replies : []
         }
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -242,7 +259,8 @@ class home extends Component {
 
     handleCloseModal = () => {
         this.setState({
-            setShowModal : false
+            setShowModal : false,
+            alertShow : false
         })
     }
 
@@ -297,9 +315,10 @@ class home extends Component {
             }
         })
         .then(response => {
-            console.log(response.data);
+            console.log(response.data[0].message);
             this.setState({
-                messages : response.data
+                messages : response.data[0].message,
+                replies : response.data[0].reply
             });
         }) 
         .catch(err => {
@@ -307,13 +326,14 @@ class home extends Component {
         })
     }
 
-    handleMessage = () => {
+    handleMessage = (orderid) => {
         console.log('Inside message send post request');
         const data = {
             sender : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName'),
             receiver : this.state.receiver,
             date : new Date(),
-            message : this.state.message
+            message : this.state.message,
+            orderid : orderid
         }
         axios.post('http://localhost:3001/Message/SendMessage',data,{
             headers : {
@@ -339,6 +359,7 @@ class home extends Component {
                 <div style = {divStyle3}>{item.ItemNames}</div>
                 <div style = {divStyle3}>{item.RestaurantName}</div>
                 <div style = {divStyle3}>{item.Total}</div>
+                {localStorage.setItem('OrderId',item._id)}
                 <button className = "btn btn-primary" style = {buttonStyle3} onClick = {this.handlesetModalShow.bind(this,item.RestaurantName)}>Message</button>
             </div>
         ));
@@ -350,19 +371,28 @@ class home extends Component {
                 <div style = {divStyle3}>{delItem.Total}</div>
             </div>
         ));
+        var replyReceived;
+        
         var messagesReceived;
         if(this.state.messages != null) {
-            messagesReceived = this.state.messages.map((msg) => (
+            messagesReceived = this.state.messages.map((msg,msgIndex) => (
                 <div>
-                    <p style = {pStyle6}>From : </p>
-                    <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>
-                    <p style = {pStyle7}>Message : </p>
-                    <textarea className = "form-control" defaultValue = {msg.message} style = {inputStyle8}></textarea>
-                    <hr/>
+                    <p style = {pStyle8}>Your Message : </p>
+                    <textarea className = "form-control" defaultValue = {msg} style = {inputStyle10}></textarea>
+                    {/*<p style = {pStyle6}>From : </p>
+                    <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>*/}
+                    {replyReceived = this.state.replies.map((reply,replyIndex) => (
+                    <div>
+                        {/*<p style = {pStyle6}>From : </p>
+                        <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>*/}
+                        <p style = {pStyle7}>Message : </p>
+                        <textarea className = "form-control" defaultValue = {reply} style = {inputStyle8}></textarea>
+                        <hr/>
+                    </div>
+                    ))}
                 </div>
             ));
         }
-
         return (
             <div>
                 <div style = {bodyStyle}>
@@ -447,7 +477,7 @@ class home extends Component {
                      </InputGroup>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="primary" onClick={this.handleMessage}>
+                        <Button variant="primary" onClick={this.handleMessage.bind(this,localStorage.getItem('OrderId'))}>
                             Send
                         </Button>
                         <Button variant="primary" onClick={this.handleCloseModal}>
@@ -458,6 +488,10 @@ class home extends Component {
             </div>
         )
     }
+}
+
+const messaging = () => {
+    
 }
 
 export default home;

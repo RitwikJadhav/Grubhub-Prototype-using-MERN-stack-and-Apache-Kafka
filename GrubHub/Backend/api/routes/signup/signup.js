@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const UserInfo = require('../../models/userinfoModel');
 
 router.post("/Buyer", function(req,res) {
-    const userInfoSignUp = new UserInfo({
+    var userInfoSignUp = new UserInfo({
             _id : new mongoose.Types.ObjectId(),
             FirstName : req.body.firstName,
             LastName : req.body.lastName,
@@ -16,7 +16,22 @@ router.post("/Buyer", function(req,res) {
             role : req.body.buyer
     });
 
-    userInfoSignUp.save()
+    userInfoSignUp.save(function(err) {
+        if(err) throw err;
+
+        UserInfo.findOne({
+            Email : req.body.email
+        }, function(err, user) {
+            if(err) throw err;
+
+            user.comparePassword(userInfoSignUp.Password, function(err,isMatch) {
+                if(err) throw err;
+                console.log(userInfoSignUp.Password, isMatch);
+            })
+        })
+        res.sendStatus(200).end('Signup Successful');
+    });
+    /*userInfoSignUp.save()
     .then(result => {
         console.log(result);
     })
@@ -26,7 +41,7 @@ router.post("/Buyer", function(req,res) {
     res.status(200).json({
         message : "Successfully handled the signup request",
         createdSignup : userInfoSignUp
-    });
+    });*/
 });
 
 router.post("/Owner", function(req,res) {
@@ -41,7 +56,23 @@ router.post("/Owner", function(req,res) {
         RestaurantZipCode : req.body.restaurantZipCode
     });
 
-    userInfoOwnerSignup.save()
+    userInfoOwnerSignup.save(function(err) {
+        if(err) throw err;
+
+        UserInfo.findOne({
+            Email : req.body.email
+        }, function(err, user) {
+            if(err) throw err;
+
+            user.comparePassword(userInfoOwnerSignup.Password, function(err,isMatch) {
+                if(err) throw err;
+                console.log(userInfoOwnerSignup.Password, isMatch);
+            })
+        })
+        res.sendStatus(200).end('Signup Successful');
+    });
+
+    /*userInfoOwnerSignup.save()
     .then((result) => {
         console.log(result);
     })
@@ -52,7 +83,7 @@ router.post("/Owner", function(req,res) {
     res.status(200).json({
         message : "Successfully handled the owner signup request",
         createdOwnerSignup : userInfoOwnerSignup
-    });
+    });*/
 });
 
 

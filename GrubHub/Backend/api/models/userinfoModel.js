@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const userinfoSchema = new mongoose.Schema({
      _id: mongoose.Schema.Types.ObjectId,
      FirstName: String,
      LastName : String,
-     Email : String,
-     Password : String,
+     Email : {
+          type : String,
+          required : true,
+          index : { unique : true}
+     },
+     Password : {
+          type : String
+     },
      Address : String,
      RestaurantName : String,
      RestaurantZipCode : String,
@@ -15,25 +21,23 @@ const userinfoSchema = new mongoose.Schema({
      PhoneNumber : String
 }) 
 
-userinfoSchema.pre('save',async function(next) {
-     const user = this;
-     if(this.isModified('Password') || this.isNew) {
-           bcrypt.genSalt(10, function(err,salt) {
+userinfoSchema.pre('save', function(next) {
+     var user = this;
+     if(!user.isModified('Password')) {
+          return next();
+     }
+     bcrypt.genSalt(10, function(err,salt) {
+          if(err) {
+               return next(err);
+          }
+          bcrypt.hash(user.Password,salt,function(err,hash) {
                if(err) {
                     return next(err);
                }
-               bcrypt.hash(user.Password,salt,function(err,hash) {
-                    if(err) {
-                         return next(err);
-                    }
-                    user.Password = hash;
-                    next();
-               });
-           });
-     }
-     else {
-          return next();
-     }
+               user.Password = hash;
+               next();
+          });
+     });
 });
 
 /*userinfoSchema.methods.isValidPassword = async function(Password) {

@@ -6,6 +6,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import MenuPage from './MenuPage';
+import DisplayImage from './DisplayImage';
+import paginate from 'paginate-array';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -107,7 +109,8 @@ const divStyle3 = {
     marginTop : '35px',
     marginLeft : '-15px',
     width : '650px',
-    height : '2250px'
+    height : '2250px',
+    padding: '1rem 2rem'
 }
 
 
@@ -134,11 +137,45 @@ const pStyle5 = {
     paddingTop : '0px'
 }
 
+const inputStyle2 = {
+    width : '200px',
+    marginLeft : '200px',
+    marginTop : '-200px',
+    marginBottom : '400px'
+}
+
+const inputStyle3 = {
+    width : '300px',
+    marginLeft : '200px',
+    marginTop : '-385px',
+    marginBottom : '285px'
+}
+
+const inputStyle4 = {
+    width : '100px',
+    marginLeft : '200px',
+    marginTop : '-265px',
+    marginBottom : '30px'
+}
+
+const divStyle4 = {
+    backgroundColor : '#EBEBED',
+    width : '150px',
+    height : '150px',
+    marginTop : '29px',
+    marginBottom : '50px'
+}
+
+const divStyle5 = {
+    marginTop : '-10px'
+}
+
 class MenuHomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: []
+            items: [],
+            
         }
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -153,16 +190,9 @@ class MenuHomePage extends Component {
             }
         }
         axios.get(`http://localhost:3001/Menu/HomePage/${localRestaurantName}`,config)
-        .then(response => this.setState({ items : response.data })
-            /*this.setState({
-                itemId : response.data[0].itemid,
-                itemName : response.data[0].itemName,
-                itemPrice : response.data[0].itemprice,
-                itemDesc : response.data[0].description,
-                sectionName : response.data[0].SectionName,
-                restaurantName : response.data[0].RestaurantName
-            })*/
-        );
+        .then(response => {
+            this.setState({ items : response.data });
+        });
     }
 
     handleLogout = () => {
@@ -170,6 +200,17 @@ class MenuHomePage extends Component {
     }
 
     render() {  
+        const MenuList = this.state.items.map((item) => (
+            <div key = {item._id} style = {divStyle5}>
+                <div style = {divStyle4}>
+                    <DisplayImage imageName = {item.itemName}/>
+                </div>
+                <input type = "text" name = "itemName" className = "form-control" value = {item.itemName} style = {inputStyle2}></input>
+                <input type = "text" name = "itemDescription" className = "form-control" value = {item.description} style = {inputStyle3}></input>
+                <input type = "text" name = "itemPrice" className = "form-control" value =  {item.itemprice} style = {inputStyle4}></input>
+                <hr/>
+            </div>
+        ));
         return (
             <div>
                 <div style = {bodyStyle}>
@@ -191,7 +232,7 @@ class MenuHomePage extends Component {
                     <div className = "container" style = {divStyle1}>
                         <p style = {pStyle}>Restaurant Menu</p>
                         <div className = "jumbotron" style = {divStyle3}>
-                            <MenuPage items = {this.state.items} style = {inputStyle}/>
+                            {MenuList}
                         </div>
                     </div>
 
