@@ -3,68 +3,98 @@ const router = express.Router();
 var mysql = require('mysql');
 var pool = require('../../../pool');
 const passport = require('passport');
+var kafka = require('../../kafka/client');
 
 const UserInfo = require('../../models/userinfoModel');
 
 router.get('/:id', passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log('Inside profile edit backend request');
+    console.log('Inside /ProfileOwner');
     console.log(req.params.id);
-    UserInfo.findOne({
-        Email : req.params.id
-    })
-    .then(response => {
-        if(!response) {
-            res.json({
+
+    const body = {
+        parameter : req.params.id
+    }
+
+    kafka.make_request('get_profile_buyer',body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'User not found'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response : "+response)
-            console.log(JSON.stringify(response))
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+                /*res.status(200).json({
+                    success : true,
+                    message : 'User Registered successfully'
+                });*/
+                //res.end();
         }
-    })
-    .catch(err => {
-        console.log(err)
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
     });
 });
 
 router.get('/Edit/:id',passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log("Inside profile Owner edit get request using router");
-    UserInfo.findOne({
-        Email : req.params.id
-    })
-    .then(response => {
-        if(!response) {
-            res.json({
+    console.log("Inside /Profile Edit");
+
+    const body = {
+        parameter : req.params.id
+    }
+
+    kafka.make_request('get_profile_buyer',body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'User not found'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response : "+response)
-            console.log(JSON.stringify(response))
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+                /*res.status(200).json({
+                    success : true,
+                    message : 'User Registered successfully'
+                });*/
+                //res.end();
         }
-    })
-    .catch(err => {
-        console.log(err)
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
     });
-
 });
 
 router.post("/EditUpdateOwner", function(req,res) {
-    console.log("Inside profile Owner post edit update request using router");
-    UserInfo.findOneAndUpdate(
+    console.log("Inside /Profile Owner Update");
+
+    console.log(req.body.Email);
+
+    kafka.make_request('update_profile_owner',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+                /*res.status(200).json({
+                    success : true,
+                    message : 'User Registered successfully'
+                });*/
+                //res.end();
+        }
+    });
+    /*UserInfo.findOneAndUpdate(
         {Email : req.body.Email},
         {$set : {FirstName : req.body.FirstName, LastName : req.body.LastName, Email : req.body.Email, PhoneNumber : req.body.PhoneNumber, RestaurantName : req.body.RestaurantName, RestaurantZipCode : req.body.RestaurantZipCode, Cuisine: req.body.Cuisine}},
         {new : true}
@@ -81,7 +111,7 @@ router.post("/EditUpdateOwner", function(req,res) {
             console.log("Response : "+response);
             res.send(JSON.stringify(response));
         }
-    })
+    })*/
 });
 
 

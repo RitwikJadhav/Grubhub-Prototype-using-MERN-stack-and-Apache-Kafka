@@ -6,6 +6,10 @@ import {Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from './grubhub-vector-logo.svg';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { signUpBuyer } from '../../actions/signupAction';
+
 
 const loginContainerStyle = {
     backgroundColor : '#FEFEFE',
@@ -167,7 +171,7 @@ class Signup extends Component {
             buyer : this.state.buyer
         }
 
-        axios.post('http://localhost:3001/Signup/Buyer',data)
+        /*axios.post('http://localhost:3001/Signup/Buyer',data)
         .then(response => {
             console.log(response.status);
             if(response.status === 200) {
@@ -176,7 +180,10 @@ class Signup extends Component {
                 })
                 this.props.history.push('/login');
             }
-        })
+        })*/
+
+        this.props.signUpBuyer(data);
+        this.props.history.push('/Login');
     }
 
     render() {
@@ -230,4 +237,8 @@ class Signup extends Component {
     }
 }
 
-export default Signup;
+Signup.protoType = {
+    signUpBuyer : PropTypes.func.isRequired
+};
+
+export default connect(null, { signUpBuyer })(Signup);

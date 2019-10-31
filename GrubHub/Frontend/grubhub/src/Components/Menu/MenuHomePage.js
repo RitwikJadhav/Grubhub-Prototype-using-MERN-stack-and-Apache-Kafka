@@ -8,6 +8,9 @@ import axios from 'axios';
 import MenuPage from './MenuPage';
 import DisplayImage from './DisplayImage';
 import paginate from 'paginate-array';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { itemMenuDisplay } from '../../actions/itemAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -181,9 +184,17 @@ class MenuHomePage extends Component {
         this.handleLogout = this.handleLogout.bind(this);
     }
 
+    componentWillReceiveProps({items}) {
+        console.log('Inside menu will receive props');
+        this.setState({
+            items : items
+        });
+    }
+
     componentDidMount() {
         console.log('Inside component will mount method');
-        var localRestaurantName = localStorage.getItem('RestaurantName');
+        this.props.itemMenuDisplay();
+        /*var localRestaurantName = localStorage.getItem('RestaurantName');
         const config = {
             headers : {
                 Authorization : "JWT " + localStorage.getItem('Token')
@@ -192,10 +203,11 @@ class MenuHomePage extends Component {
         axios.get(`http://localhost:3001/Menu/HomePage/${localRestaurantName}`,config)
         .then(response => {
             this.setState({ items : response.data });
-        });
+        });*/
     }
 
     handleLogout = () => {
+        window.localStorage.clear();
         cookie.remove('cookie',{ path : '/' });
     }
 
@@ -205,9 +217,9 @@ class MenuHomePage extends Component {
                 <div style = {divStyle4}>
                     <DisplayImage imageName = {item.itemName}/>
                 </div>
-                <input type = "text" name = "itemName" className = "form-control" value = {item.itemName} style = {inputStyle2}></input>
-                <input type = "text" name = "itemDescription" className = "form-control" value = {item.description} style = {inputStyle3}></input>
-                <input type = "text" name = "itemPrice" className = "form-control" value =  {item.itemprice} style = {inputStyle4}></input>
+                <input type = "text" name = "itemName" className = "form-control" defaultValue = {item.itemName} style = {inputStyle2}></input>
+                <input type = "text" name = "itemDescription" className = "form-control" defaultValue = {item.description} style = {inputStyle3}></input>
+                <input type = "text" name = "itemPrice" className = "form-control" defaultValue =  {item.itemprice} style = {inputStyle4}></input>
                 <hr/>
             </div>
         ));
@@ -254,4 +266,13 @@ class MenuHomePage extends Component {
     }
 }
 
-export default MenuHomePage;
+MenuHomePage.protoType = {
+    itemMenuDisplay : PropTypes.func.isRequired,
+    items : PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => ({
+    items : state.menuItems.items
+})
+
+export default connect(mapStateToProps, { itemMenuDisplay })(MenuHomePage);

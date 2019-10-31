@@ -5,6 +5,10 @@ import {Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { sectionAddition } from '../../actions/sectionAction';
+
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -172,7 +176,10 @@ class SectionAddPage extends Component {
             restaurantName : localStorage.getItem('RestaurantName')
         }
         console.log(data);
-            axios.post("http://localhost:3001/Menu/SectionAddPage",data, {
+
+        this.props.sectionAddition(data);
+        this.props.history.push('/Menu/HomePage/:id');
+            /*axios.post("http://localhost:3001/Menu/SectionAddPage",data, {
                 headers : {
                     Authorization : "JWT " + localStorage.getItem("Token")
                 }
@@ -180,7 +187,7 @@ class SectionAddPage extends Component {
             .then(response => {
                 console.log(response.data);
                 this.props.history.push('/Menu/HomePage/:id');
-            })
+            })*/
         }
 
     handleInput = (e) => {
@@ -228,4 +235,8 @@ class SectionAddPage extends Component {
     }
 }
 
-export default SectionAddPage;
+SectionAddPage.protoType = {
+    sectionAddition : PropTypes.func.isRequired
+};
+
+export default connect(null, { sectionAddition })(SectionAddPage);

@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import SearchResultsContainer from './SearchResultsContainer';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { searchItem } from '../../actions/searchAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -81,7 +84,14 @@ class SearchResults extends Component {
         this.handleLogout = this.handleLogout.bind(this);
     }
 
-    componentDidMount() {
+    componentWillReceiveProps({item}) {
+        console.log('Inside search items will receive props');
+        this.setState({
+            items : item
+        });
+    }
+
+    componentWillMount() {
         console.log('Inside the search component did mount');
         const data = {
             itemToSearch : sessionStorage.getItem('ItemToSearch')
@@ -92,7 +102,8 @@ class SearchResults extends Component {
             });
         }*/
         console.log(data.itemToSearch);
-        axios.post('http://localhost:3001/SearchResults',data, {
+        this.props.searchItem(data);
+        /*axios.post('http://localhost:3001/SearchResults',data, {
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -109,7 +120,7 @@ class SearchResults extends Component {
                 })
             }
             
-        })
+        })*/
         
     }
 
@@ -152,4 +163,13 @@ class SearchResults extends Component {
     }
 }
 
-export default SearchResults;
+SearchResults.protoType = {
+    searchItem : PropTypes.func.isRequired,
+    item : PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => ({
+    item : state.searchedItems.itemsToSearch
+})
+
+export default connect(mapStateToProps, { searchItem })(SearchResults);

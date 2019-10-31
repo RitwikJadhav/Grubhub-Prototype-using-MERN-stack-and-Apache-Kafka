@@ -6,6 +6,9 @@ import {Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from './grubhub-vector-logo.svg';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { signUpOwner } from '../../actions/signupAction';
 
 const loginContainerStyle = {
     backgroundColor : '#FEFEFE',
@@ -186,7 +189,10 @@ class Signup extends Component {
             owner : this.state.owner
         }
 
-        axios.post('http://localhost:3001/Signup/Owner',data)
+        this.props.signUpOwner(data);
+        this.props.history.push('/Login');
+
+        /*axios.post('http://localhost:3001/Signup/Owner',data)
         .then(response => {
             console.log(response.status);
             if(response.status === 200) {
@@ -195,7 +201,7 @@ class Signup extends Component {
                 })
                 this.props.history.push('/login');
             }
-        })
+        })*/
     }
 
     render() {
@@ -259,4 +265,8 @@ class Signup extends Component {
     }
 }
 
-export default Signup;
+Signup.protoType = {
+    signUpOwner : PropTypes.func.isRequired
+};
+
+export default connect(null, { signUpOwner })(Signup);

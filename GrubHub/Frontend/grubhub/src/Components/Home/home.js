@@ -182,7 +182,8 @@ class home extends Component {
             message : "",
             alertShow : false,
             messages : [],
-            replies : []
+            replies : [],
+            msgState : ""
         }
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -264,7 +265,8 @@ class home extends Component {
         })
     }
 
-    handleSearchResults = () => {
+    handleSearchResults = (e) => {
+        e.preventDefault();
         console.log('inside handle search results');
         console.log(this.state.searchItem);
         if(this.state.searchItem == "") {
@@ -377,19 +379,28 @@ class home extends Component {
         if(this.state.messages != null) {
             messagesReceived = this.state.messages.map((msg,msgIndex) => (
                 <div>
-                    <p style = {pStyle8}>Your Message : </p>
-                    <textarea className = "form-control" defaultValue = {msg} style = {inputStyle10}></textarea>
+                    {msgIndex % 2 == 0 ? (
+                        <div>
+                            <p style = {pStyle8}>Your Message : </p>
+                            <textarea className = "form-control" defaultValue = {msg} style = {inputStyle10}></textarea>
+                        </div>
+                    ) : (
+                        <div>
+                            <p style = {pStyle7}>Message : </p>
+                            <textarea className = "form-control" defaultValue = {msg} style = {inputStyle8}></textarea>
+                        </div>
+                    )} 
                     {/*<p style = {pStyle6}>From : </p>
                     <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>*/}
-                    {replyReceived = this.state.replies.map((reply,replyIndex) => (
-                    <div>
+                    {/*{replyReceived = this.state.replies.map((reply,replyIndex) => (
+                    <div key = {msgIndex}>*/}
                         {/*<p style = {pStyle6}>From : </p>
                         <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle9}></input>*/}
-                        <p style = {pStyle7}>Message : </p>
+                        {/*<p style = {pStyle7}>Message : </p>
                         <textarea className = "form-control" defaultValue = {reply} style = {inputStyle8}></textarea>
                         <hr/>
                     </div>
-                    ))}
+                    ))}*/}
                 </div>
             ));
         }

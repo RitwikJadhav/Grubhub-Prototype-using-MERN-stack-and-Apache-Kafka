@@ -5,6 +5,9 @@ import {Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { itemMenuGet, itemUpdation } from '../../actions/itemAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -135,23 +138,18 @@ class SectionUpdatePage extends Component {
         this.handleInput = this.handleInput.bind(this);
     }
 
+    componentWillReceiveProps({items}) {
+        console.log('Inside menu will receive props');
+        this.setState({
+            itemName : items.itemName,
+            itemDesc : items.description,
+            itemPrice : items.itemprice
+        });
+    }
+
     componentDidMount() {
         console.log('Inside item edit componentDidMount');
-        var getLocalString = localStorage.getItem('ItemToUpdate');
-        const config = {
-            headers : {
-                Authorization : 'JWT ' + localStorage.getItem('Token')
-            }
-        };
-        axios.get(`http://localhost:3001/Menu/SectionUpdatePage/${getLocalString}`,config)
-        .then((response) => {
-            console.log(response.data);
-            this.setState({
-                itemName : response.data.itemName,
-                itemDesc : response.data.description,
-                itemPrice : response.data.itemprice
-            });
-        })
+        this.props.itemMenuGet();
     }
 
     handleLogout = () => {
@@ -173,7 +171,10 @@ class SectionUpdatePage extends Component {
         localStorage.removeItem('ItemToUpdate');
         localStorage.setItem('ItemToUpdate',data.itemName);
 
-        axios.post("http://localhost:3001/Menu/SectionUpdatePage",data, {
+        this.props.itemUpdation(data);
+        this.props.history.push('/Menu/HomePage/:id');
+
+        /*axios.post("http://localhost:3001/Menu/SectionUpdatePage",data, {
             headers : {
                 Authorization : 'JWT '+ localStorage.getItem('Token')
             }
@@ -183,7 +184,7 @@ class SectionUpdatePage extends Component {
             if(response.status === 200) {
                 this.props.history.push('/Menu/HomePage/:id');
             }
-        })
+        })*/
     }
 
     handleInput = (e) => {
@@ -230,5 +231,14 @@ class SectionUpdatePage extends Component {
         )
     }
 }
+SectionUpdatePage.protoType = {
+    itemMenuGet : PropTypes.func.isRequired,
+    itemUpdation : PropTypes.func.isRequired,
+    items : PropTypes.array.isRequired
+};
 
-export default SectionUpdatePage;
+const mapStateToProps = state => ({
+    items : state.menuItems.items
+})
+
+export default connect(mapStateToProps, { itemMenuGet, itemUpdation })(SectionUpdatePage);

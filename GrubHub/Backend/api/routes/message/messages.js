@@ -113,7 +113,7 @@ router.post('/SendReply', passport.authenticate('jwt',{ session : false }), func
     Messages.findOneAndUpdate(
         { receiver : req.body.sender,
         sender : req.body.receiver},
-        {$push : {reply : req.body.message}})
+        {$push : {message : req.body.message}})
     .then(response => {
         console.log(response);
         if(!response) {

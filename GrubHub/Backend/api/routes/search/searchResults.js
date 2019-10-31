@@ -1,29 +1,28 @@
 const express = require('express');
-var mysql = require('mysql');
-var pool = require('../../../pool');
 const router = express.Router(); 
 const mongoose = require('mongoose');
 const passport = require('passport');
+var kafka = require('../../kafka/client');
 
-const Items = require('../../models/itemModel');
 
 router.post("/", passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log("Inside search result post request");
-    console.log(req.body.itemToSearch);
-    Items.find({
-        itemName : req.body.itemToSearch
-    })
-    .then(response => {
-        console.log("Response from the database for Menu : "+response)
-        console.log(JSON.stringify(response))
-        res.send(JSON.stringify(response));
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
+    console.log("Inside /Search");
+
+    kafka.make_request('get_searched_items',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+        }
     });
 });
 

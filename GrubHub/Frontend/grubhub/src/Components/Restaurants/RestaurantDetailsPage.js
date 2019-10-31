@@ -7,6 +7,9 @@ import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import RestaurantDetailsContainer from './RestaurantDetailsContainer';
 import { array } from 'prop-types';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { restaurantSearchItem } from '../../actions/restaurantAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -71,10 +74,19 @@ class RestaurantDetailsPage extends Component {
         }
     }
 
+    componentWillReceiveProps({item}) {
+        console.log('Inside search items will receive props');
+        this.setState({
+            sections : item
+        });
+    }
+
     componentDidMount() {
         console.log('Inside the restaurant search component did mount');
+
+        this.props.restaurantSearchItem();
         // let restaurantToSearch = localStorage.getItem('RestaurantNameForCustomer');
-        let restaurantToSearch = this.props.match.params.id;
+        /*let restaurantToSearch = this.props.match.params.id;
         console.log(this.props);
         console.log(restaurantToSearch);
         const config = {
@@ -88,7 +100,7 @@ class RestaurantDetailsPage extends Component {
             this.setState({
                 sections : response.data
             })
-        })
+        })*/
         
     }
 
@@ -124,4 +136,13 @@ class RestaurantDetailsPage extends Component {
     }
 }
 
-export default RestaurantDetailsPage;
+RestaurantDetailsPage.protoType = {
+    restaurantSearchItem : PropTypes.func.isRequired,
+    item : PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => ({
+    item : state.searchItemsForRestaurant.itemsToDisplay
+})
+
+export default connect(mapStateToProps, { restaurantSearchItem })(RestaurantDetailsPage);

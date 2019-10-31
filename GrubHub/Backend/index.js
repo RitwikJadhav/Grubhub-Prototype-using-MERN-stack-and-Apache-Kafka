@@ -17,6 +17,7 @@ const jwt = require('jsonwebtoken');
 app.use(passport.initialize());
 const UserInfo = require('../Backend/api/models/userinfoModel');
 app.set('view engine', 'ejs');
+var kafka = require('./api/kafka/client');
 
 
 //use cors to allow cross origin resource sharing

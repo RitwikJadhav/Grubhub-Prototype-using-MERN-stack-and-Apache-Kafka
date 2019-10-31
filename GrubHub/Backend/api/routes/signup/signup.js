@@ -3,87 +3,58 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+var kafka = require('../../kafka/client');
 
 const UserInfo = require('../../models/userinfoModel');
 
 router.post("/Buyer", function(req,res) {
-    var userInfoSignUp = new UserInfo({
-            _id : new mongoose.Types.ObjectId(),
-            FirstName : req.body.firstName,
-            LastName : req.body.lastName,
-            Email : req.body.email,
-            Password : req.body.password,
-            role : req.body.buyer
-    });
+    console.log('Inside /Buyer');
+    console.log('Making request to Kafka >> ');
 
-    userInfoSignUp.save(function(err) {
-        if(err) throw err;
-
-        UserInfo.findOne({
-            Email : req.body.email
-        }, function(err, user) {
-            if(err) throw err;
-
-            user.comparePassword(userInfoSignUp.Password, function(err,isMatch) {
-                if(err) throw err;
-                console.log(userInfoSignUp.Password, isMatch);
-            })
-        })
-        res.sendStatus(200).end('Signup Successful');
+    kafka.make_request('create_user',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+                res.status(200).json({
+                    success : true,
+                    message : 'User Registered successfully'
+                });
+                //res.end();
+            }
     });
-    /*userInfoSignUp.save()
-    .then(result => {
-        console.log(result);
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-    res.status(200).json({
-        message : "Successfully handled the signup request",
-        createdSignup : userInfoSignUp
-    });*/
 });
 
 router.post("/Owner", function(req,res) {
-    const userInfoOwnerSignup = new UserInfo({
-        _id : new mongoose.Types.ObjectId(),
-        FirstName : req.body.firstName,
-        LastName : req.body.lastName,
-        Email : req.body.email,
-        Password : req.body.password,
-        role : req.body.owner,
-        RestaurantName : req.body.restaurantName,
-        RestaurantZipCode : req.body.restaurantZipCode
+    console.log('Inside /Owner');
+    console.log('Making request to Kafka >> ');
+
+    kafka.make_request('create_user_owner',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+                res.status(200).json({
+                    success : true,
+                    message : 'User - Owner Registered successfully'
+                });
+                //res.end();
+            }
     });
-
-    userInfoOwnerSignup.save(function(err) {
-        if(err) throw err;
-
-        UserInfo.findOne({
-            Email : req.body.email
-        }, function(err, user) {
-            if(err) throw err;
-
-            user.comparePassword(userInfoOwnerSignup.Password, function(err,isMatch) {
-                if(err) throw err;
-                console.log(userInfoOwnerSignup.Password, isMatch);
-            })
-        })
-        res.sendStatus(200).end('Signup Successful');
-    });
-
-    /*userInfoOwnerSignup.save()
-    .then((result) => {
-        console.log(result);
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-
-    res.status(200).json({
-        message : "Successfully handled the owner signup request",
-        createdOwnerSignup : userInfoOwnerSignup
-    });*/
 });
 
 

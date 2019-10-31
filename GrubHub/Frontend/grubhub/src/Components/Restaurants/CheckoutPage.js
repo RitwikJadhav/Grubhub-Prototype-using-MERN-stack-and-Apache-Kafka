@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import CheckoutPageContainer from './CheckoutPageContainer';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { placeCheckedOrder } from '../../actions/orderAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -227,7 +230,9 @@ class CheckoutPage extends Component {
             totalCost : sessionStorage.getItem('TotalwithTaxes')
         }
         sessionStorage.setItem('orderidforcustomer',data.orderId);
-        axios.post('http://localhost:3001/Restaurant/CheckoutOrders',data,{
+        this.props.placeCheckedOrder(data);
+        this.props.history.push('/home');
+        /*axios.post('http://localhost:3001/Restaurant/CheckoutOrders',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -238,7 +243,7 @@ class CheckoutPage extends Component {
         })
         .catch(err => {
             console.log(err);
-        })
+        })*/
         
     }
 
@@ -308,4 +313,8 @@ class CheckoutPage extends Component {
     }
 }
 
-export default CheckoutPage;
+CheckoutPage.protoType = {
+    placeCheckedOrder : PropTypes.func.isRequired
+};
+
+export default connect(null, { placeCheckedOrder })(CheckoutPage);

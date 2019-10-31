@@ -6,6 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import imageSearch from '../Home/search.svg';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { itemRemoval } from '../../actions/itemAction';
+import { sectionRemoval } from '../../actions/sectionAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -133,6 +137,7 @@ class ItemRemovePage extends Component {
     }
 
     handleLogout = () => {
+        window.localStorage.clear();
         cookie.remove('cookie',{ path : '/' });
     }
 
@@ -143,13 +148,16 @@ class ItemRemovePage extends Component {
             itemToRemove : this.state.itemToRemove
         }
         console.log(data);
-        axios.post('http://localhost:3001/Menu/ItemRemovePage',data)
+
+        this.props.itemRemoval(data);
+        this.props.history.push('/Menu/HomePage/:id');
+        /*axios.post('http://localhost:3001/Menu/ItemRemovePage',data)
         .then(response => {
             console.log(response.data);
             if(response.status === 200) {
                 this.props.history.push('/Menu/HomePage/:id');
             }
-        })
+        })*/
 
 
     }
@@ -168,7 +176,10 @@ class ItemRemovePage extends Component {
             restauratName : localStorage.getItem('RestaurantName')
         }
         console.log(data);
-        axios.post('http://localhost:3001/Menu/SectionRemove',data, {
+
+        this.props.sectionRemoval(data);
+        this.props.history.push('/Menu/HomePage/:id');
+        /*axios.post('http://localhost:3001/Menu/SectionRemove',data, {
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -178,7 +189,7 @@ class ItemRemovePage extends Component {
             if(response.status === 200) {
                 this.props.history.push('/Menu/HomePage/:id');
             }
-        })
+        })*/
     }
 
     render() {  
@@ -222,4 +233,9 @@ class ItemRemovePage extends Component {
     }
 }
 
-export default ItemRemovePage;
+ItemRemovePage.protoType = {
+    itemRemoval : PropTypes.func.isRequired,
+    sectionRemoval : PropTypes.func.isRequired
+};
+
+export default connect(null, { itemRemoval, sectionRemoval })(ItemRemovePage);

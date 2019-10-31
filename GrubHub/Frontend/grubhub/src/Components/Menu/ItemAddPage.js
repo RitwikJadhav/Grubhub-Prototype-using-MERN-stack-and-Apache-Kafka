@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import UploadItemImage from './UploadItemImage';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { itemAddition } from '../../actions/itemAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -198,7 +201,7 @@ class ItemAddPage extends Component {
         console.log(data);
         localStorage.setItem('ItemName',data.itemName);
 
-        axios.post("http://localhost:3001/Menu/ItemAddPage",data,{
+        /*axios.post("http://localhost:3001/Menu/ItemAddPage",data,{
             headers : {
                 Authorization : 'JWT '+localStorage.getItem('Token')
             }
@@ -208,7 +211,9 @@ class ItemAddPage extends Component {
             if(response.status === 200) {
                 this.props.history.push('/Menu/HomePage/:id');
             }
-        })
+        })*/
+        this.props.itemAddition(data);
+        this.props.history.push('/Menu/HomePage/:id');
     }
 
     handleInput = (e) => {
@@ -263,4 +268,8 @@ class ItemAddPage extends Component {
     }
 }
 
-export default ItemAddPage;
+ItemAddPage.protoType = {
+    itemAddition : PropTypes.func.isRequired
+};
+
+export default connect(null, { itemAddition })(ItemAddPage);
