@@ -107,7 +107,8 @@ class OwnerOrderItem extends Component {
         const data = {
             selectedValue : this.state.selectedValue,
             orderid : this.props.order.orderid,
-            orderPersonName : this.props.order.OrderPersonName        
+            orderPersonName : this.props.order.OrderPersonName,
+            orderTotal : this.props.order.Total        
         }
         console.log(data);
         axios.post('http://localhost:3001/Order/OrderStatusUpdate',data,{

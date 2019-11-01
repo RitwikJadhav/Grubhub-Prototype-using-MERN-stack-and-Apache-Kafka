@@ -4,121 +4,93 @@ var pool = require('../../../pool');
 const router = express.Router(); 
 const mongoose = require('mongoose');
 const passport = require('passport');
-
+var kafka = require('../../kafka/client');
 const Orders = require('../../models/orderModel');
 
 router.post("/RecentOrderReq", passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log("Inside recent order get request");
-    Orders.find({
-        RestaurantName : req.body.restaurantName
-    })
-    .then(response => {
-        if(!response) {
-            res.json({
+    console.log("Inside /Recent Order Request");
+
+    kafka.make_request('get_order_restaurant',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Error while retrieving orders'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response from the database : "+ response);
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
     });
 });
 
 router.post("/OrderStatusUpdate",  passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log("Inside recent order get request");
+    console.log("Inside /Update order status");
 
-    Orders.findOneAndUpdate(
-        {OrderPersonName : req.body.orderPersonName},
-        {$set : {Status : req.body.selectedValue}}
-    )
-    .then(response => {
-        if(!response) {
-            res.json({
+    kafka.make_request('update_order_status',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Error while retrieving orders'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response from the database : "+ response);
-            res.json({
-                success : true,
-                message : 'Item updated successfully'
-            });
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
-    })
+    });
 });
 
 router.post("/GetRecentOrderRequest", passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log("Inside recent order get customer request");
+    console.log("Inside /Get Active Orders");
     //const personName = req.body.firstName + " " + req.body.lastName;
-    console.log(req.body.fullName);
-    Orders.find({
-        OrderPersonName : req.body.fullName
-    })
-    .then(response => {
-        if(!response) {
-            res.json({
+
+    kafka.make_request('get_active_orders',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Error while retrieving orders'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response from the database : "+ response);
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
-    })
+    });
 });
 
 
 router.post("/GetDeliveredItems", passport.authenticate('jwt',{ session : false }), function(req,res) {
     console.log("Inside recent order get delivered customer request");
-    const personName = req.body.firstName + " " + req.body.lastName;
-    Orders.find({
-        OrderPersonName : personName,
-        Status : 'Order delivered'
-    })
-    .then(response => {
-        if(!response) {
-            res.json({
+
+    kafka.make_request('get_delivered_orders',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Error while retrieving orders'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log("Response from the database : "+ response);
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Something went wrong'
-        });
-    })
+    });
 });
 
 module.exports = router;

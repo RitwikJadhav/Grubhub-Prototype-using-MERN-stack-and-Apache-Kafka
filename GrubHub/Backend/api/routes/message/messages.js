@@ -2,147 +2,91 @@ const express = require('express');
 const router = express.Router(); 
 const mongoose = require('mongoose');
 const passport = require('passport');
-
+var kafka = require('../../kafka/client');
 const Messages = require('../../models/messageModel');
 
 router.post('/SendMessage', passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log('Inside message send request');
-    console.log('Sender : '+req.body.sender);
-    console.log('Sender : '+req.body.receiver);
-    Messages.findOne({
-        sender : req.body.sender,
-        receiver : req.body.receiver
-    }, function(err,result) {
-        console.log('Err : '+err );
-        console.log('Result : ' +result);
-        if(!result) {
-            const messages = new Messages({
-                _id : new mongoose.Types.ObjectId(),
-                sender : req.body.sender,
-                receiver : req.body.receiver,
-                message : req.body.message,
-                date : req.body.date
-            })
-        
-            messages.save()
-            .then(response => {
-                console.log(response);
-                if(!response) {
-                    res.json({
-                        success : false,
-                        message : 'Message not saved'
-                    });
-                }
-                else {
-                    console.log(response);
-                    res.json({
-                        success : true,
-                        message : 'Message saved successfully'
-                    })
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                res.json({
-                    success : false,
-                    message : 'Error in adding sections'
-                });
-            });
-        }
-        else if(result) {
-            Messages.update({
-                $push : { message : req.body.message}
-            })
-            .then(response => {
-                console.log(response);
-                if(!response) {
-                    res.json({
-                        success : false,
-                        message : 'Message not saved'
-                    });
-                }
-                else {
-                    console.log(response);
-                    res.json({
-                        success : true,
-                        message : 'Message updated successfully'
-                    })
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                res.json({
-                    success : false,
-                    message : 'Error in adding sections'
-                });
-            });
-        }
-    }); 
-});
+    console.log('Inside /Send message buyer');
 
-router.post('/ReceivedMessages', passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log('Inside receive messages request');
-    Messages.find({
-        receiver : req.body.restaurantName
-    })
-    .then(response => {
-        console.log(response);
-        if(!response) {
-            res.json({
+    kafka.make_request('send_message',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Messages not received'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log(response);
-            res.send(JSON.stringify(response));
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Error in adding sections'
-        });
+    });
+});
+
+router.post('/ReceivedMessages', passport.authenticate('jwt',{ session : false }), function(req,res) {
+    console.log('Inside /Receive Messages');
+
+    kafka.make_request('get_message',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+        }
     });
 });
 
 router.post('/SendReply', passport.authenticate('jwt',{ session : false }), function(req,res) {
-    console.log('Inside message send request');
-
-    Messages.findOneAndUpdate(
-        { receiver : req.body.sender,
-        sender : req.body.receiver},
-        {$push : {message : req.body.message}})
-    .then(response => {
-        console.log(response);
-        if(!response) {
-            res.json({
+    console.log('Inside /Send Reply');
+    kafka.make_request('send_reply',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
                 success : false,
-                message : 'Reply not saved'
+                message : "Something went wrong"
             });
         }
         else {
-            console.log(response);
-            res.json({
-                success : true,
-                message : 'Reply saved successfully'
-            })
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
         }
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            success : false,
-            message : 'Error in adding sections'
-        });
     });
 });
 
 router.post('/ReceivedReply', passport.authenticate('jwt',{ session : false }), function(req,res) {
     console.log('Inside message reply request');
 
-    Messages.find({
+    kafka.make_request('get_reply',req.body, function(err,results){
+        console.log('Kafka response received <<');
+        console.log(results);
+        if (err) {
+            console.log("Inside err");
+            res.status(400).json({
+                success : false,
+                message : "Something went wrong"
+            });
+        }
+        else {
+            console.log("Results received successfully --->");
+            console.log(JSON.stringify(results));
+            res.send(JSON.stringify(results));
+        }
+    });
+    /*Messages.find({
         receiver : req.body.restaurantName
     })
     .then(response => {
@@ -164,6 +108,6 @@ router.post('/ReceivedReply', passport.authenticate('jwt',{ session : false }), 
             success : false,
             message : 'Error in adding sections'
         });
-    });
+    });*/
 });
 module.exports = router;
