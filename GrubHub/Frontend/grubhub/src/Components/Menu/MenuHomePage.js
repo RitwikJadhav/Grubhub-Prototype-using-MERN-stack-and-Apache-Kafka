@@ -178,9 +178,11 @@ class MenuHomePage extends Component {
         super(props);
         this.state = {
             items: [],
-            
+            currentPage : 1,
+            itemsPerPage : 3
         }
 
+        this.handleClick = this.handleClick.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
 
@@ -211,8 +213,20 @@ class MenuHomePage extends Component {
         cookie.remove('cookie',{ path : '/' });
     }
 
+    handleClick(event) {
+        console.log(event.target.id);
+        this.setState({
+          currentPage: Number(event.target.id)
+        });
+      }
+
     render() {  
-        const MenuList = this.state.items.map((item) => (
+        const {items,currentPage, itemsPerPage} = this.state;
+
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+        const MenuList = currentItems.map((item) => (
             <div key = {item._id} style = {divStyle5}>
                 <div style = {divStyle4}>
                     <DisplayImage imageName = {item.itemName}/>
@@ -223,6 +237,18 @@ class MenuHomePage extends Component {
                 <hr/>
             </div>
         ));
+
+        const pageNumbers = [];
+        for(let i = 1; i <= Math.ceil(items.length / itemsPerPage);i++) {
+            pageNumbers.push(i);
+        }
+        const renderNumbers = pageNumbers.map(number => {
+            return (
+                <button className = "btn btn-outline-primary" key = {number} id = {number} onClick = {this.handleClick}> 
+                    {number}
+                </button>
+            );
+        });
         return (
             <div>
                 <div style = {bodyStyle}>
@@ -245,6 +271,7 @@ class MenuHomePage extends Component {
                         <p style = {pStyle}>Restaurant Menu</p>
                         <div className = "jumbotron" style = {divStyle3}>
                             {MenuList}
+                            {renderNumbers}
                         </div>
                     </div>
 
