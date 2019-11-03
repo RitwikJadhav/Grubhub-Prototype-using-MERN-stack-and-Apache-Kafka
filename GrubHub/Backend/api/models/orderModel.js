@@ -9,7 +9,9 @@ const orders = new mongoose.Schema({
     OrderPersonName : String,
     Address : String,
     Status : String,
-    Total : String
+    Total : String,
+    PositionX : Number,
+    PositionY : Number
 });
 
 module.exports = mongoose.model('Orders',orders);

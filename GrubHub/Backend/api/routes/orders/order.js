@@ -93,4 +93,54 @@ router.post("/GetDeliveredItems", passport.authenticate('jwt',{ session : false 
     });
 });
 
+router.post('/drag',passport.authenticate('jwt',{ session : false }), function(req,res) {
+    console.log('Inside /drag');
+
+    Orders.findOneAndUpdate({
+        OrderPersonName : req.body.fullName,
+        RestaurantName : req.body.restaurantName,
+        Total : req.body.orderTotalCost
+    }, {$set : {
+        PositionX : req.body.positionX,
+        PositionY : req.body.positionY
+    }},{
+        new : true
+    })
+    .then(response => {
+        console.log(response);
+        res.json({
+            success : true,
+            message : 'Successfully updated the co-ordinates'
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        res.json({
+            success : true,
+            message : 'Something went wrong'
+        });
+    })
+});
+
+router.post('/getDrag',passport.authenticate('jwt',{ session : false }), function(req,res) {
+    console.log('Inside /drag');
+
+    Orders.findOne({
+        OrderPersonName : req.body.fullName,
+        RestaurantName : req.body.restaurantName,
+        Total : req.body.orderTotalCost
+    })
+    .then(response => {
+        console.log(response);
+        res.send(JSON.stringify(response));
+    })
+    .catch(err => {
+        console.log(err);
+        res.json({
+            success : true,
+            message : 'Something went wrong'
+        });
+    })
+});
+
 module.exports = router;

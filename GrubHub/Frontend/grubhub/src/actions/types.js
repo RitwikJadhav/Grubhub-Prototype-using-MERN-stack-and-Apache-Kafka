@@ -37,3 +37,7 @@ export const RESTAURANT_DISPLAY = "RESTAURANT_DISPLAY";
 //Place Order
 
 export const PLACE_ORDER = "PLACE_ORDER";
+
+export const GET_ACTIVE_ORDER = "GET_ACTIVE_ORDER";
+
+export const GET_DELIVERED_ORDER = "GET_DELIVERED_ORDER";

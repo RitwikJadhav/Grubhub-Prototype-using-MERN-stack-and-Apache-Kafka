@@ -10,21 +10,22 @@ const divStyle1 = {
     fontFamily : 'graphik-sans',
     fontSize : '18px',
     fontWeight : '500',
-    marginLeft : '180px'
+    marginLeft : '70px',
+    marginTop : '10px'
 }
 
 const divStyle2 = {
     fontFamily : 'graphik-sans',
     fontSize : '18px',
     fontWeight : '500',
-    marginLeft : '400px'
+    marginLeft : '320px'
 }
 
 const divStyle3 = {
     fontFamily : 'graphik-sans',
     fontSize : '18px',
     fontWeight : '500',
-    marginLeft : '630px'
+    marginLeft : '600px'
 }
 
 const divStyle4 = {
@@ -38,23 +39,23 @@ const pStyle1 = {
     fontFamily : 'graphik-sans',
     fontSize : '20px',
     fontWeight : '700',
-    marginLeft : '200px',
-    marginTop : '-72px'
+    marginLeft : '70px',
+    marginTop : '0px'
 }
 
 const pStyle2 = {
     fontFamily : 'graphik-sans',
     fontSize : '20px',
     fontWeight : '700',
-    marginLeft : '380px',
-    marginTop : '-72px'
+    marginLeft : '320px',
+    marginTop : '-98px'
 }
 
 const pStyle3 = {
     fontFamily : 'graphik-sans',
     fontSize : '20px',
     fontWeight : '700',
-    marginLeft : '650px',
+    marginLeft : '620px',
     marginTop : '-72px'
 }
 
@@ -137,10 +138,12 @@ class OwnerOrderItem extends Component {
         
         return(
             <div>
-                <p style = {pStyle4}>Order id</p>
-                <div style = {divStyle4}>{this.props.order.orderid}</div>
                 <p style = {pStyle1}>Item Name</p>
-                <div style = {divStyle1}>{this.props.order.ItemNames}</div>
+                <div style = {divStyle1}>{this.props.order.ItemNames.map((name) => (
+                    <div>
+                        <div>{name}</div>
+                    </div>
+                ))}</div>
                 <p style = {pStyle2}>Customer Name</p>
                 <div style = {divStyle2}>{this.props.order.OrderPersonName}</div>
                 <p style = {pStyle3}>Status</p>

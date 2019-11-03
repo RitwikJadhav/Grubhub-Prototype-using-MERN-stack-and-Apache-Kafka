@@ -8,6 +8,10 @@ import axios from 'axios';
 import pizzaImage from './cropped-2.jpg';
 import searchIcon from './search.svg';
 import { Modal,Button,InputGroup,FormControl, Alert } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { getActiveOrders } from '../../actions/orderAction';
+import Draggable, {DraggableCore} from 'react-draggable'; // Both at the same time
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -102,7 +106,7 @@ const divStyle4 = {
     fontWeight : '600',
     marginLeft : '30px',
     marginTop : '10px',
-    paddingTop : '50px'
+    paddingTop : '20px'
     
 }
 
@@ -183,14 +187,94 @@ class home extends Component {
             alertShow : false,
             messages : [],
             replies : [],
-            msgState : ""
+            msgState : "",
+            deltaPosition : {
+                x : 0, y : 0
+            }
         }
-
+        //this.onStart = this.onStart.bind(this);
+        this.onStop = this.onStop.bind(this);
+        this.handleDrag = this.handleDrag.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
         this.handleSearchResults = this.handleSearchResults.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handlesetModalShow = this.handlesetModalShow.bind(this);
         this.handleMessage = this.handleMessage.bind(this);
+    }
+
+    handleDrag = (e, ui) => {
+        const {x, y} = this.state.deltaPosition;
+        this.setState({
+          deltaPosition: {
+            x: x + ui.deltaX,
+            y: y + ui.deltaY,
+          }
+        });
+    }
+
+    /*onStart = () => {
+        //this.setState({activeDrags: ++this.state.activeDrags});
+        console.log('Inside onstart method');
+        const data = {
+            orderTotalCost : sessionStorage.getItem('TotalwithTaxes'),
+            restaurantName : localStorage.getItem('RestaurantNameForCustomer'),
+            firstName : localStorage.getItem('FirstName'),
+            lastName : localStorage.getItem('LastName'),
+            fullName : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName')
+        };
+        console.log(data);
+        axios.post('http://localhost:3001/Order/getDrag',{
+            headers : {
+                Authorization : "JWT " + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+      };*/
+    
+    onStop = () => {
+        //this.setState({activeDrags: --this.state.activeDrags});
+        console.log('Inside onstop method');
+        console.log(localStorage.getItem('X'));
+        console.log(localStorage.getItem('Y'));
+        const data = {
+            orderTotalCost : '29.90',
+            restaurantName : 'mg',
+            firstName : localStorage.getItem('FirstName'),
+            lastName : localStorage.getItem('LastName'),
+            fullName : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName'),
+            positionX : localStorage.getItem('X'),
+            positionY : localStorage.getItem('Y')
+        };
+        console.log(data);
+        axios.post('http://localhost:3001/Order/drag',data,{
+            headers : {
+                Authorization : "JWT " + localStorage.getItem('Token')
+            }
+        })
+        .then(response => {
+            console.log(response);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    };
+
+    componentWillReceiveProps({activeOrders}) {
+        console.log('inside will receive props');
+        console.log(activeOrders[0].PositionX);
+        console.log(activeOrders[0].PositionY);
+        this.setState({
+            items : activeOrders,
+            deltaPosition : {
+                x : activeOrders[0].PositionX,
+                y : activeOrders[0].PositionY
+            }
+        });
     }
 
     componentDidMount() {
@@ -203,21 +287,9 @@ class home extends Component {
             fullName : localStorage.getItem('FirstName') + " " + localStorage.getItem('LastName')
         }
         console.log(data);
-        axios.post('http://localhost:3001/Order/GetRecentOrderRequest',data,{
-            headers : {
-                Authorization : 'JWT ' + localStorage.getItem('Token')
-            }
-        })
-        .then(response => {
-            console.log(response.data);
-            this.setState({
-                items : response.data
-            })
-            console.log(this.state.items); 
-        }).catch(err => {
-            console.log(err);
-        })
+        this.props.getActiveOrders(data);
 
+        //******************************* */
         console.log('past orders request');
         const data1 = {
             firstName : localStorage.getItem('FirstName'),
@@ -355,10 +427,20 @@ class home extends Component {
     }
 
     render() {  
+        const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+        const {deltaPosition} = this.state;
+        //console.log(deltaPosition);
+        localStorage.setItem('X',deltaPosition.x);
+        localStorage.setItem('Y',deltaPosition.y);
         const orderNameList = this.state.items.map((item) => (
             <div key = {item.orderid} style = {divStyle2}>
                 <div style = {divStyle4}>{item.Status}</div>
-                <div style = {divStyle3}>{item.ItemNames}</div>
+                <div style = {divStyle3}>{item.ItemNames.map((name) => (
+                    <div>
+                        <div>{name}</div>
+                    </div>
+                ))}
+                </div>
                 <div style = {divStyle3}>{item.RestaurantName}</div>
                 <div style = {divStyle3}>{item.Total}</div>
                 {localStorage.setItem('OrderId',item._id)}
@@ -434,9 +516,16 @@ class home extends Component {
                         <p style = {pStyle3}>Your Active Orders</p>
                         <div className = "container">
                             <div className = "row">
-                                <div className = "col-sm">
-                                    {orderNameList}
+                            <Draggable onDrag={this.handleDrag} {...dragHandlers}>
+                                <div className="box">
+                                    {/*<div>I track my deltas</div>
+                                    <div>x: {deltaPosition.x.toFixed(0)}, y: {deltaPosition.y.toFixed(0)}</div>*/}
+                                    <div className = "col-sm">
+                                        {orderNameList}
+                                    </div>
                                 </div>
+                            </Draggable>
+                                
                             </div>
                         </div>
                         <p style = {pStyle4}>Your Past Orders</p>
@@ -501,8 +590,13 @@ class home extends Component {
     }
 }
 
-const messaging = () => {
-    
-}
+home.protoType = {
+    getActiveOrders : PropTypes.func.isRequired,
+    activeOrders : PropTypes.array.isRequired
+};
 
-export default home;
+const mapStateToProps = state => ({
+    activeOrders : state.orders.ordersReceived
+})
+
+export default connect(mapStateToProps, { getActiveOrders })(home);

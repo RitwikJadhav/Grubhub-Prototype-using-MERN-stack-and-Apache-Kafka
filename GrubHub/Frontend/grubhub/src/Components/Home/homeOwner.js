@@ -24,8 +24,8 @@ const navStyle = {
 };
 
 const buttonStyle = {
-    marginLeft: '910px',
-    width : '200px'
+    marginLeft: '870px',
+    width : '230px'
 }
 
 const linkStyle = {
