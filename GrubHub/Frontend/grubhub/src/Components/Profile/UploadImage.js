@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import constants from '../../config';
 const axios = require("axios");
+
 
 const imageStyle = {
     width : '300px',
@@ -16,7 +18,7 @@ class UploadImage extends Component {
         super(props);
         this.state = {
             file: null,
-            image : `http://localhost:3001/uploads/${localStorage.getItem('Email')}`
+            image : `${constants.apiUrl}uploads/${localStorage.getItem('Email')}`
         };
         this.onChange = this.onChange.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -41,7 +43,7 @@ class UploadImage extends Component {
             }
         };
         console.log(config);
-        axios.post(`http://localhost:3001/uploads/${localStorage.getItem('Email')}`,formData,config)
+        axios.post(`${constants.apiUrl}uploads/${localStorage.getItem('Email')}`,formData,config)
         .then((response) => {
             alert("The File is successfully uploaded");
         });

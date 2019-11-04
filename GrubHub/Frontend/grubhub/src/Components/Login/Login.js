@@ -10,10 +10,10 @@ import { Modal,Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loginRequest } from '../../actions/loginAction';
+import constants from '../../config.js';
 var jwtDecode = require('jwt-decode');
 
 
- 
 const loginContainerStyle = {
     backgroundColor : '#FEFEFE',
     height: '430px',
@@ -126,7 +126,7 @@ class Login extends Component {
         console.log(data);
         //this.props.loginRequest(data);
         axios.defaults.withCredentials = true;
-        axios.post('http://localhost:3001/Login',data)
+        axios.post(constants.apiUrl+'Login',data)
         .then(response => {
             console.log(response.data.token);
             const fullJwtToken = response.data.token;

@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import Upload from './UploadImage';
+import constants from '../../config';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -86,7 +87,7 @@ class ProfileEditOwner extends Component {
                 Authorization : "JWT "+ localStorage.getItem('Token')
             }
         };
-        axios.get(`http://localhost:3001/ProfileOwner/Edit/${getLocalString}`,config)
+        axios.get(`${constants.apiUrl}ProfileOwner/Edit/${getLocalString}`,config)
         .then((response) => {
             console.log(response.data);
             this.setState({
@@ -123,7 +124,7 @@ class ProfileEditOwner extends Component {
             Cuisine : this.state.Cuisine
         }
         console.log(data);
-        axios.post("http://localhost:3001/ProfileOwner/EditUpdateOwner",data, {
+        axios.post(constants.apiUrl+"ProfileOwner/EditUpdateOwner",data, {
             headers : {
                 Authorization : "JWT "+localStorage.getItem('Token')
             }

@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import {Link} from 'react-router-dom';
+import constants from '../../config';
 
 import propTypes from 'prop-types';
 import RestItemsContainer from './RestItemsContainer';
@@ -36,7 +37,7 @@ class RestaurantItemsPage extends Component {
             restaurantName : localStorage.getItem('RestaurantNameForCustomer')
         }
         console.log(data);
-        axios.post('http://localhost:3001/Restaurant/RestaurantItemsPage',data, {
+        axios.post(constants.apiUrl+'Restaurant/RestaurantItemsPage',data, {
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token') 
             }

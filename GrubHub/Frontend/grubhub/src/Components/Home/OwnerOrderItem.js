@@ -5,6 +5,10 @@ import axios from 'axios';
 import {Link} from 'react-router-dom';
 import { Modal,Button } from 'react-bootstrap';
 import propTypes from 'prop-types';
+import constants from '../../config';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { updateOrderStatus } from '../../actions/orderAction';
 
 const divStyle1 = {
     fontFamily : 'graphik-sans',
@@ -112,7 +116,11 @@ class OwnerOrderItem extends Component {
             orderTotal : this.props.order.Total        
         }
         console.log(data);
-        axios.post('http://localhost:3001/Order/OrderStatusUpdate',data,{
+        this.props.updateOrderStatus(data);
+        this.setState({
+            setShow : true
+        });
+        /*axios.post(constants.apiUrl+'Order/OrderStatusUpdate',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -125,7 +133,7 @@ class OwnerOrderItem extends Component {
         })
         .catch(err => {
             console.log(err);
-        })
+        })*/
     }
 
     handleClose = () => {
@@ -174,8 +182,8 @@ class OwnerOrderItem extends Component {
     }
 }
 
-OwnerOrderItem.propTypes = {
-    order : propTypes.object.isRequired 
-}
+OwnerOrderItem.protoType = {
+    updateOrderStatus : PropTypes.func.isRequired
+};
 
-export default OwnerOrderItem;
+export default connect(null, { updateOrderStatus })(OwnerOrderItem);

@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import Upload from './UploadImage';
+import constants from '../../config';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -88,7 +89,7 @@ class ProfileOwner extends Component {
                 Authorization : "JWT "+ localStorage.getItem('Token')
             }
         }
-        axios.get(`http://localhost:3001/profileOwner/${getLocalString}`,config)
+        axios.get(`${constants.apiUrl}profileOwner/${getLocalString}`,config)
         .then((response) => {
             console.log(response.data);
             document.getElementById('FirstNameDiv').innerHTML = response.data.FirstName;

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import constants from '../../config';
 const axios = require("axios");
+
 
 const imageStyle = {
     width : '150px',
@@ -12,7 +14,7 @@ class DisplayImage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            image : `http://localhost:3001/uploads/${this.props.imageName}`
+            image : `${constants.apiUrl}uploads/${this.props.imageName}`
         };
         this.onChange = this.onChange.bind(this);
     }

@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getActiveOrders } from '../../actions/orderAction';
 import Draggable, {DraggableCore} from 'react-draggable'; // Both at the same time
+import constants from '../../config';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -187,13 +188,9 @@ class home extends Component {
             alertShow : false,
             messages : [],
             replies : [],
-            msgState : "",
-            deltaPosition : {
-                x : 0, y : 0
-            }
+            msgState : ""
         }
         //this.onStart = this.onStart.bind(this);
-        this.onStop = this.onStop.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
         this.handleSearchResults = this.handleSearchResults.bind(this);
@@ -236,7 +233,7 @@ class home extends Component {
         });
       };*/
     
-    onStop = () => {
+    /*onStop = () => {
         //this.setState({activeDrags: --this.state.activeDrags});
         console.log('Inside onstop method');
         console.log(localStorage.getItem('X'));
@@ -251,7 +248,7 @@ class home extends Component {
             positionY : localStorage.getItem('Y')
         };
         console.log(data);
-        axios.post('http://localhost:3001/Order/drag',data,{
+        axios.post(constants.apiUrl+'Order/drag',data,{
             headers : {
                 Authorization : "JWT " + localStorage.getItem('Token')
             }
@@ -262,18 +259,12 @@ class home extends Component {
         .catch(err => {
             console.log(err);
         });
-    };
+    };*/
 
     componentWillReceiveProps({activeOrders}) {
         console.log('inside will receive props');
-        console.log(activeOrders[0].PositionX);
-        console.log(activeOrders[0].PositionY);
         this.setState({
-            items : activeOrders,
-            deltaPosition : {
-                x : activeOrders[0].PositionX,
-                y : activeOrders[0].PositionY
-            }
+            items : activeOrders
         });
     }
 
@@ -297,7 +288,7 @@ class home extends Component {
         }
 
         console.log(data1);
-        axios.post('http://localhost:3001/Order/GetDeliveredItems',data1,{
+        axios.post(constants.apiUrl+'Order/GetDeliveredItems',data1,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -383,7 +374,7 @@ class home extends Component {
         const data = {
             restaurantName : restName
         }
-        axios.post('http://localhost:3001/Message/ReceivedReply',data,{
+        axios.post(constants.apiUrl+'Message/ReceivedReply',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -409,7 +400,7 @@ class home extends Component {
             message : this.state.message,
             orderid : orderid
         }
-        axios.post('http://localhost:3001/Message/SendMessage',data,{
+        axios.post(constants.apiUrl+'Message/SendMessage',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -430,8 +421,6 @@ class home extends Component {
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
         const {deltaPosition} = this.state;
         //console.log(deltaPosition);
-        localStorage.setItem('X',deltaPosition.x);
-        localStorage.setItem('Y',deltaPosition.y);
         const orderNameList = this.state.items.map((item) => (
             <div key = {item.orderid} style = {divStyle2}>
                 <div style = {divStyle4}>{item.Status}</div>
@@ -442,7 +431,7 @@ class home extends Component {
                 ))}
                 </div>
                 <div style = {divStyle3}>{item.RestaurantName}</div>
-                <div style = {divStyle3}>{item.Total}</div>
+                <div style = {divStyle3}>${item.Total}</div>
                 {localStorage.setItem('OrderId',item._id)}
                 <button className = "btn btn-primary" style = {buttonStyle3} onClick = {this.handlesetModalShow.bind(this,item.RestaurantName)}>Message</button>
             </div>
@@ -516,7 +505,7 @@ class home extends Component {
                         <p style = {pStyle3}>Your Active Orders</p>
                         <div className = "container">
                             <div className = "row">
-                            <Draggable onDrag={this.handleDrag} {...dragHandlers}>
+                            <Draggable onDrag={this.handleDrag}>
                                 <div className="box">
                                     {/*<div>I track my deltas</div>
                                     <div>x: {deltaPosition.x.toFixed(0)}, y: {deltaPosition.y.toFixed(0)}</div>*/}

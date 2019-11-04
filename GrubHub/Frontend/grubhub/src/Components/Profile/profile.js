@@ -6,7 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import Upload from './UploadImage';
-
+import constants from '../../config';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { getProfileDetails } from '../../actions/profileAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -87,15 +90,25 @@ class profile extends Component {
         this.handleLogout = this.handleLogout.bind(this);
     }
 
+    componentWillReceiveProps({ profiles }) {
+        console.log('Insdide component will received props');
+        console.log(profiles);
+        document.getElementById('FirstNameDiv').innerHTML = profiles.FirstName;
+        document.getElementById('LastNameDiv').innerHTML = profiles.LastName;
+        document.getElementById('EmailDiv').innerHTML = profiles.Email;
+        document.getElementById('PhoneNumberDiv').innerHTML = profiles.PhoneNumber;
+    }
+
     componentDidMount = () => {
         console.log('Inside componentDidMount');
-        var getLocalString = localStorage.getItem('Email')
+        this.props.getProfileDetails();
+        /*var getLocalString = localStorage.getItem('Email')
         let config = {
             headers : {
                 Authorization : "JWT " + localStorage.getItem('Token')
             }
         }
-        axios.get(`http://localhost:3001/Profile/${getLocalString}`,config)
+        axios.get(`${constants.apiUrl}Profile/${getLocalString}`,config)
         .then((response) => {
             console.log(response.data);
             document.getElementById('FirstNameDiv').innerHTML = response.data.FirstName;
@@ -103,7 +116,7 @@ class profile extends Component {
             document.getElementById('EmailDiv').innerHTML = response.data.Email;
             document.getElementById('PhoneNumberDiv').innerHTML = response.data.PhoneNumber;
 
-        })
+        })*/
     }
 
     handleChange = (e) => {
@@ -164,4 +177,13 @@ class profile extends Component {
     }
 }
 
-export default profile;
+profile.protoType = {
+    getProfileDetails : PropTypes.func.isRequired,
+    profiles : PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => ({
+    profiles : state.profile.getProfile
+})
+
+export default connect(mapStateToProps, { getProfileDetails })(profile);

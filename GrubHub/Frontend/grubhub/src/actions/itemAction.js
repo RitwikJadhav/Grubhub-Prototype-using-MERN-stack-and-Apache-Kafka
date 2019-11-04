@@ -4,10 +4,11 @@ import { ITEM_DISPLAY } from './types';
 import { ITEM_GET } from './types';
 import { ITEM_UPDATE } from './types';
 import axios from 'axios';
+import constants from '../config';
 
 export const itemAddition = (userData) => dispatch => {
     console.log('Item addition Request action called');
-    axios.post('http://localhost:3001/Menu/ItemAddPage',userData,{
+    axios.post(constants.apiUrl+'Menu/ItemAddPage',userData,{
         headers : {
             Authorization : 'JWT '+localStorage.getItem('Token')
         }
@@ -21,7 +22,7 @@ export const itemAddition = (userData) => dispatch => {
 
 export const itemRemoval = (userData) => dispatch => {
     console.log('Item deletion action called');
-    axios.post('http://localhost:3001/Menu/ItemRemovePage',userData,{
+    axios.post(constants.apiUrl+'Menu/ItemRemovePage',userData,{
         headers : {
             Authorization : 'JWT '+localStorage.getItem('Token')
         }
@@ -38,7 +39,7 @@ export const itemMenuDisplay = () => dispatch => {
     var localRestaurantName = localStorage.getItem('RestaurantName');
     console.log(localRestaurantName);
     console.log(localStorage.getItem('Token'));
-    axios.get(`http://localhost:3001/Menu/HomePage/${localRestaurantName}`,{
+    axios.get(`${constants.apiUrl}Menu/HomePage/${localRestaurantName}`,{
         headers : {
             Authorization : "JWT " + localStorage.getItem('Token')
         }
@@ -53,7 +54,7 @@ export const itemMenuDisplay = () => dispatch => {
 export const itemMenuGet = () => dispatch => {
     console.log('Item get update action called');
     var getLocalString = localStorage.getItem('ItemToUpdate');
-    axios.get(`http://localhost:3001/Menu/SectionUpdatePage/${getLocalString}`,{
+    axios.get(`${constants.apiUrl}Menu/SectionUpdatePage/${getLocalString}`,{
         headers : {
             Authorization : "JWT " + localStorage.getItem('Token')
         }
@@ -67,7 +68,7 @@ export const itemMenuGet = () => dispatch => {
 
 export const itemUpdation = (userData) => dispatch => {
     console.log('Item updation Request action called');
-    axios.post('http://localhost:3001/Menu/SectionUpdatePage',userData,{
+    axios.post(constants.apiUrl+'Menu/SectionUpdatePage',userData,{
         headers : {
             Authorization : 'JWT '+localStorage.getItem('Token')
         }

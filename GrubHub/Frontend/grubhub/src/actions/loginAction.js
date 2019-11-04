@@ -1,11 +1,13 @@
 import { LOGIN_REQ } from './types';
 import axios from 'axios';
+import constants from '../config';
 var jwtDecode = require('jwt-decode');
+
 
 export const loginRequest = (data) => dispatch => {
     console.log('Inside login request using redux');
     axios.defaults.withCredentials = true;
-        axios.post('http://localhost:3001/Login',data)
+        axios.post(constants.apiUrl+'Login',data)
         .then(response => {
             console.log(response);
             console.log(response.data.token);

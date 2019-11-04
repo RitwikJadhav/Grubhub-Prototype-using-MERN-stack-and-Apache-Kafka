@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import constants from '../../config';
 const axios = require("axios");
+
 
 const imageStyle = {
     width : '200px',
@@ -55,7 +57,7 @@ class UploadItemImage extends Component {
         console.log(this.props.itemName);
         const itemName = this.props.itemName;
         console.log(itemName);
-        axios.post(`http://localhost:3001/uploads/${itemName}`,formData,configImage)
+        axios.post(`${constants.apiUrl}uploads/${itemName}`,formData,configImage)
         .then((response) => {
             console.log(response);
             alert("The File is successfully uploaded");

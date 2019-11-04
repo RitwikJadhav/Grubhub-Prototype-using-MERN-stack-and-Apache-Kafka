@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import Upload from './UploadImage';
+import constants from '../../config';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -93,7 +94,7 @@ class ProfileEdit extends Component {
                 Authorization : "JWT "+ localStorage.getItem('Token')
             }
         }
-        axios.get(`http://localhost:3001/Profile/Edit/${getLocalString}`,config)
+        axios.get(`${constants.apiUrl}Profile/Edit/${getLocalString}`,config)
         .then((response) => {
             console.log(response.data);
             this.setState({
@@ -124,7 +125,7 @@ class ProfileEdit extends Component {
             PhoneNumber : this.state.PhoneNumber
         }
         console.log(data);
-        axios.post("http://localhost:3001/Profile/EditUpdate",data, {
+        axios.post(constants.apiUrl+"Profile/EditUpdate",data, {
             headers : {
                 Authorization : "JWT "+ localStorage.getItem('Token')
             }

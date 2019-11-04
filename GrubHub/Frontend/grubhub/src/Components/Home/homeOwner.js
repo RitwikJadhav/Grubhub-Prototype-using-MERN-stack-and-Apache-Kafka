@@ -7,6 +7,10 @@ import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
 import OwnerOrderContainer from './OwnerOrderContainer';
 import { Modal,Button,InputGroup,FormControl, Alert } from 'react-bootstrap';
+import constants from '../../config';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { getOwnerOrders, updateOrderStatus } from '../../actions/orderAction';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -152,6 +156,10 @@ const inputStyle1 = {
     marginBottom : '5px'
 }
 
+const divStyle5 = {
+    height : '150px'
+}
+
 class homeOwner extends Component {
     constructor(props) {
         super(props);
@@ -177,34 +185,26 @@ class homeOwner extends Component {
         this.handleInput = this.handleInput.bind(this);
     }
 
+    componentWillReceiveProps({activeOrders}) {
+        console.log('Inside will receive props');
+        if(activeOrders.Status == 'Order delivered') {
+            this.setState({
+                delivered : activeOrders
+            });
+        }
+        else {
+            this.setState({
+                orders : activeOrders
+            });
+        }
+    }
+
     componentDidMount() {
         console.log('Inside recent orders request');
         const data = {
             restaurantName : localStorage.getItem('RestaurantName')
         }
-        axios.post('http://localhost:3001/Order/RecentOrderReq',data,{
-            headers : {
-                Authorization : 'JWT ' + localStorage.getItem('Token')
-            }
-        })
-        .then(response => {
-            console.log(response.data);
-            let i;
-            if(response.data.Status == 'Order delivered') {
-                this.setState({
-                        delivered : response.data
-                })
-            }
-            else {
-                this.setState({
-                    orders : response.data
-                })        
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        })
-        console.log(this.state.delivered);
+        this.props.getOwnerOrders(data);
     }
 
     handleLogout = () => {
@@ -221,7 +221,7 @@ class homeOwner extends Component {
         const data = {
             restaurantName : localStorage.getItem('RestaurantName')
         }
-        axios.post('http://localhost:3001/Message/ReceivedMessages',data,{
+        axios.post(constants.apiUrl+'Message/ReceivedMessages',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -255,7 +255,7 @@ class homeOwner extends Component {
             receiver : this.state.receiver,
             message : this.state.message
         }
-        axios.post('http://localhost:3001/Message/SendReply',data,{
+        axios.post(constants.apiUrl+'Message/SendReply',data,{
             headers : {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
@@ -297,7 +297,10 @@ class homeOwner extends Component {
                 <p style = {pStyle6}>From : </p>
                 <input type = "text" className = "form-control" defaultValue = {msg.sender} style = {inputStyle}></input>
                 <p style = {pStyle7}>Message : </p>
-                <textarea className = "form-control" defaultValue = {msg.message} style = {inputStyle1}></textarea>
+                <div className = "form-control" style = {divStyle5}>{msg.message.map((m) => (
+                    <div>{m}</div>
+                ))}</div>
+                
                 <hr/>
             </div>
         ));
@@ -377,4 +380,14 @@ class homeOwner extends Component {
     }
 }
 
-export default homeOwner;
+homeOwner.protoType = {
+    getOwnerOrders : PropTypes.func.isRequired,
+    updateOrderStatus : PropTypes.func.isRequired,
+    activeOrders : PropTypes.array.isRequired
+};
+
+const mapStateToProps = state => ({
+    activeOrders : state.orders.ordersReceived
+})
+
+export default connect(mapStateToProps, { getOwnerOrders, updateOrderStatus})(homeOwner);

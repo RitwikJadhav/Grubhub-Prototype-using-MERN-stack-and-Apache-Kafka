@@ -1,11 +1,14 @@
 import { PLACE_ORDER } from '../actions/types';
 import { GET_ACTIVE_ORDER } from '../actions/types';
 import { GET_DELIVERED_ORDER } from '../actions/types';
+import { GET_ORDERS_OWNER } from '../actions/types';
+import { UPDATE_ORDER_STATUS } from '../actions/types';
 
 const initialState = {
     itemsToOrder : {},
     ordersReceived : {},
-    ordersDelivered : {}
+    ordersDelivered : {},
+    orderStatus : {}
 };
 
 export default function(state = initialState, {type, payload}) {
@@ -27,6 +30,19 @@ export default function(state = initialState, {type, payload}) {
                 ...state,
                 ordersDelivered: payload
             };
+
+        case GET_ORDERS_OWNER : 
+            return {
+                ...state,
+                ordersReceived: payload
+            };
+
+        case UPDATE_ORDER_STATUS : 
+            return {
+                ...state,
+                orderStatus: payload
+            };
+
 
         default :
             return state;

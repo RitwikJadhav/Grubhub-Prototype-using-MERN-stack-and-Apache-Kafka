@@ -5,6 +5,7 @@ import {Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Logo from '../Login/grubhub-vector-logo.svg';
 import axios from 'axios';
+import constants from '../../config';
 
 const bodyStyle = {
     backgroundColor : '#EBEBED',
@@ -202,7 +203,7 @@ class ItemUpdatePage extends Component {
                 Authorization : 'JWT ' + localStorage.getItem('Token')
             }
         };
-        axios.get(`http://localhost:3001/Menu/ItemUpdatePage/${getLocalString}`,config)
+        axios.get(`${constants.apiUrl}Menu/ItemUpdatePage/${getLocalString}`,config)
         .then((response) => {
             console.log(response.data);
             this.setState({
@@ -229,7 +230,7 @@ class ItemUpdatePage extends Component {
         localStorage.removeItem('SectionToUpdate');
         localStorage.setItem('SectionToUpdate',data.sectionName);
 
-        axios.post("http://localhost:3001/Menu/ItemUpdatePage",data)
+        axios.post(constants.apiUrl+"Menu/ItemUpdatePage",data)
         .then(response => {
             console.log(response.status);
             if(response.status === 200) {

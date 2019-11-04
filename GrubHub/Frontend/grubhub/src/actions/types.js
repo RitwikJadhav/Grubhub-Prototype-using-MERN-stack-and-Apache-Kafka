@@ -41,3 +41,11 @@ export const PLACE_ORDER = "PLACE_ORDER";
 export const GET_ACTIVE_ORDER = "GET_ACTIVE_ORDER";
 
 export const GET_DELIVERED_ORDER = "GET_DELIVERED_ORDER";
+
+export const GET_ORDERS_OWNER = "GET_ORDERS_OWNER";
+
+export const UPDATE_ORDER_STATUS = "UPDATE_ORDER_STATUS";
+
+//Profile
+
+export const GET_PROFILE = "GET_PROFILE"
