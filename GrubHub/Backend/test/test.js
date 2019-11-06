@@ -15,12 +15,12 @@ var assert = require('assert');
 var expect = chai.expect;
 
 describe('Grubhub Test Cases', function() {
-    this.timeout(15000);
+    this.timeout(150000);
     it("Test Case 1 : Signup Owner", function(done) {
 
         const data = {
-            "firstName" : "RitwikJ",
-            "lastName" : "Jadhav",
+            "firstName" : "Test",
+            "lastName" : "Mocha",
             "email" : "a@b.com",
             "password" : "123",
             "restaurantName" : "abc",
@@ -28,10 +28,13 @@ describe('Grubhub Test Cases', function() {
             "owner" : "Owner"
         }
 
+        console.log(data);
+
         chai.request(app)
-        .post('/OwnerSignup')
+        .post('/Signup/Owner')
         .send(data)
         .end(function(err,res) {
+            //console.log(res);
             expect(res).to.have.status(200);
             done();
         });
@@ -40,15 +43,16 @@ describe('Grubhub Test Cases', function() {
     it("Test Case 2 : Item Add Page", function(done) {
 
         const data = {
-            "itemName" : "Pizza",
+            "itemName" : "Pancake",
             "itemDesc" : "Cheesy",
             "itemPrice" : "12",
             "itemSection" : "Lunch",
-            "restaurantName" : "LA VIC"
+            "restaurantName" : "mg"
         }
 
         chai.request(app)
         .post('/Menu/ItemAddPage')
+        .set({'Authorization':'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGE0ZDY1YTEzNDg1ZDRjZjgxZmNmODEiLCJGaXJzdE5hbWUiOiJld2VmZmV3Znd3dHIiLCJMYXN0TmFtZSI6ImdlZ2UiLCJFbWFpbCI6ImdnZ0BnLmNvbSIsIlBhc3N3b3JkIjoiJDJhJDEwJFhST2xXUThuM3hHQXEyT1lyeXpDZk9ya3NuTzVkb3Q5eHVOY3VLeGFGaHovQUlhZnhwM3B5Iiwicm9sZSI6IkJ1eWVyIiwiX192IjowLCJQaG9uZU51bWJlciI6Ijg4ODg3ODQxODciLCJpYXQiOjE1NzMwMDA4NTMsImV4cCI6MTU3MzAxMDkzM30.yCuxXIgYT0zhHIY5vyuAX0Z0xGfzKk_CHPobG77DKLs'})
         .send(data)
         .end(function(err,res) {
             expect(res).to.have.status(200);
@@ -61,11 +65,12 @@ describe('Grubhub Test Cases', function() {
         const data = {
             "sectionName" : "Dinner",
             "sectionDesc" : "Creamy",
-            "restaurantName" : "LA VIC"
+            "restaurantName" : "mg"
         }
 
         chai.request(app)
         .post('/Menu/SectionAddPage')
+        .set({'Authorization':'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGE0ZDY1YTEzNDg1ZDRjZjgxZmNmODEiLCJGaXJzdE5hbWUiOiJld2VmZmV3Znd3dHIiLCJMYXN0TmFtZSI6ImdlZ2UiLCJFbWFpbCI6ImdnZ0BnLmNvbSIsIlBhc3N3b3JkIjoiJDJhJDEwJFhST2xXUThuM3hHQXEyT1lyeXpDZk9ya3NuTzVkb3Q5eHVOY3VLeGFGaHovQUlhZnhwM3B5Iiwicm9sZSI6IkJ1eWVyIiwiX192IjowLCJQaG9uZU51bWJlciI6Ijg4ODg3ODQxODciLCJpYXQiOjE1NzMwMDA4NTMsImV4cCI6MTU3MzAxMDkzM30.yCuxXIgYT0zhHIY5vyuAX0Z0xGfzKk_CHPobG77DKLs'})
         .send(data)
         .end(function(err,res) {
             expect(res).to.have.status(200);
@@ -81,6 +86,7 @@ describe('Grubhub Test Cases', function() {
 
         chai.request(app)
         .post('/Menu/ItemRemovePage')
+        .set({'Authorization':'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGE0ZDY1YTEzNDg1ZDRjZjgxZmNmODEiLCJGaXJzdE5hbWUiOiJld2VmZmV3Znd3dHIiLCJMYXN0TmFtZSI6ImdlZ2UiLCJFbWFpbCI6ImdnZ0BnLmNvbSIsIlBhc3N3b3JkIjoiJDJhJDEwJFhST2xXUThuM3hHQXEyT1lyeXpDZk9ya3NuTzVkb3Q5eHVOY3VLeGFGaHovQUlhZnhwM3B5Iiwicm9sZSI6IkJ1eWVyIiwiX192IjowLCJQaG9uZU51bWJlciI6Ijg4ODg3ODQxODciLCJpYXQiOjE1NzMwMDA4NTMsImV4cCI6MTU3MzAxMDkzM30.yCuxXIgYT0zhHIY5vyuAX0Z0xGfzKk_CHPobG77DKLs'})
         .send(data)
         .end(function(err,res) {
             expect(res).to.have.status(200);
@@ -96,6 +102,7 @@ describe('Grubhub Test Cases', function() {
 
         chai.request(app)
         .post('/SearchResults')
+        .set({'Authorization':'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGE0ZDY1YTEzNDg1ZDRjZjgxZmNmODEiLCJGaXJzdE5hbWUiOiJld2VmZmV3Znd3dHIiLCJMYXN0TmFtZSI6ImdlZ2UiLCJFbWFpbCI6ImdnZ0BnLmNvbSIsIlBhc3N3b3JkIjoiJDJhJDEwJFhST2xXUThuM3hHQXEyT1lyeXpDZk9ya3NuTzVkb3Q5eHVOY3VLeGFGaHovQUlhZnhwM3B5Iiwicm9sZSI6IkJ1eWVyIiwiX192IjowLCJQaG9uZU51bWJlciI6Ijg4ODg3ODQxODciLCJpYXQiOjE1NzMwMDA4NTMsImV4cCI6MTU3MzAxMDkzM30.yCuxXIgYT0zhHIY5vyuAX0Z0xGfzKk_CHPobG77DKLs'})
         .send(data)
         .end(function(err,res) {
             expect(res).to.have.status(200);

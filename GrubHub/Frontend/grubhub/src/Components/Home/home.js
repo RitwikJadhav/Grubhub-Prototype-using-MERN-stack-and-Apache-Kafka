@@ -188,7 +188,11 @@ class home extends Component {
             alertShow : false,
             messages : [],
             replies : [],
-            msgState : ""
+            msgState : "",
+            deltaPosition : {
+                x : 0,
+                y : 0
+            }
         }
         //this.onStart = this.onStart.bind(this);
         this.handleDrag = this.handleDrag.bind(this);

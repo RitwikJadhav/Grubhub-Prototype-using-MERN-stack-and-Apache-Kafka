@@ -49,3 +49,7 @@ export const UPDATE_ORDER_STATUS = "UPDATE_ORDER_STATUS";
 //Profile
 
 export const GET_PROFILE = "GET_PROFILE"
+
+//Messaging
+
+export const GET_MESSAGES = "GET_MESSAGES"

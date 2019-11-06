@@ -33,7 +33,7 @@ app.use(session({
 }));
 
 mongoose.connect('mongodb+srv://root:ritwik@grubhub-pqhor.mongodb.net/test?retryWrites=true&w=majority', {
-    useNewUrlParser : true
+    useNewUrlParser : true, poolSize : 10
 },{
     userMongoClient : true
 },{
